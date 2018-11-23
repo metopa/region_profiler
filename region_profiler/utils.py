@@ -30,14 +30,14 @@ class Timer:
     Allows to measure duration
     between ``start`` and ``stop`` events.
 
-    By default, measurement is done with nanosecond precision.
+    By default, measurement is done with seconds precision.
     This can be changed by providing a different clock as
     ``__init__`` parameter.
 
     The duration can be retrieved using
     ``current_elapsed()`` and ``total_elapsed()``.
     """
-    def __init__(self, clock=lambda: time.perf_counter_ns()):
+    def __init__(self, clock=default_clock):
         """
         :param clock: functor, that returns current clock.
                       Measurements have the same precision as the clock
@@ -66,6 +66,9 @@ class Timer:
         self._running = False
         return e
 
+    def is_running(self):
+        return self._running
+
     def current_elapsed(self):
         """Return duration of the current timer leg.
 
@@ -78,7 +81,7 @@ class Timer:
         :return: duration after last call to ``start()`` or zero
         :rtype: int, float
         """
-        return self.clock() - self._begin if self._running else 0
+        return self.clock() - self._begin if self.is_running() else 0
 
     def total_elapsed(self):
         """Return total duration across all timer legs.
