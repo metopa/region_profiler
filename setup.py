@@ -15,7 +15,7 @@ setup(
     author='Viacheslav Kroilov',
     author_email='slavakroilov@gmail.com',
     setup_requires=['pytest-runner'],
-    tests_require=['pytest'],
+    tests_require=['pytest', 'pytest-cov'],
     data_files=[('region_profiler', ['LICENSE.rst'])],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',

@@ -1,6 +1,7 @@
 ``region_profiler`` - profile custom regions of code
 ====================================================
-
+.. image:: https://travis-ci.com/metopa/region_profiler.svg?branch=master
+    :target: https://travis-ci.com/metopa/region_profiler
 
 :Synopsis: Profile user-defined regions of code without
            any external tools. Explicitly defined regions
