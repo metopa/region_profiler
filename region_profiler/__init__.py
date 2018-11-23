@@ -12,3 +12,7 @@
               statement to single iteration inside a loop.
 .. moduleauthor:: Viacheslav Kroilov <slavakroilov@gmail.com>
 """
+
+from .region_profiler import install, mark
+
+__all__ = ['install', 'mark']
