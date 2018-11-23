@@ -2,6 +2,18 @@ import time
 
 
 class SeqStats:
+    """Helper class for calculating online stats of a number sequence.
+
+    ``SeqStats`` records the following parameters of a number sequence:
+      - element count
+      - sum
+      - average
+      - min value
+      - max value
+
+    ``SeqStats`` does not store the sequence itself,
+    statistics are calculated online.
+    """
     def __init__(self):
         self.count = 0
         self.total = 0
@@ -9,6 +21,11 @@ class SeqStats:
         self.min = 0
 
     def add(self, x):
+        """
+        Update statistics with the next value of a sequence.
+
+        :param x: value to be considered
+        """
         self.count += 1
         self.total += x
         self.max = x if self.count == 1 else max(self.max, x)
@@ -16,11 +33,23 @@ class SeqStats:
 
     @property
     def avg(self):
+        """
+        Calculate sequence average.
+        :return: float
+        """
         return 0 if self.count == 0 else self.total / self.count
 
     def __str__(self):
         return 'SeqStats{{{}..{}..{}/{}}}'.format(self.min, self.avg,
                                                   self.max, self.count)
+
+
+def default_clock():
+    """Default clock provider for Timer class.
+    :return: value (in fractional seconds) of a performance counter
+    :rtype: float
+    """
+    return time.perf_counter()
 
 
 class Timer:
