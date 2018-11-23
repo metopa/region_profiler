@@ -25,47 +25,69 @@ class SeqStats:
 
 class Timer:
     """
-    Simple timer object.
+    Simple timer.
 
-    States:
-      -------
-      |Steady               --start()-> Running --stop-> Stopped
-       -------------------
-       elapsed() returns 0              elapsed() returns duration passed after last start
+    Allows to measure duration
+    between ``start`` and ``stop`` events.
 
+    By default, measurement is done with nanosecond precision.
+    This can be changed by providing a different clock as
+    ``__init__`` parameter.
+
+    The duration can be retrieved using
+    ``current_elapsed()`` and ``total_elapsed()``.
     """
-    def __init__(self, clock=time.perf_counter_ns):
+    def __init__(self, clock=lambda: time.perf_counter_ns()):
+        """
+        :param clock: functor, that returns current clock.
+                      Measurements have the same precision as the clock
+        """
         self.clock = clock
         self._begin = 0
-        self._end = 0
         self._running = False
+        self._total = 0
 
     def start(self):
+        """Start new timer measurement.
+
+        Call this function again to continue measurements.
+        """
         self._begin = self.clock()
         self._running = True
 
     def stop(self):
-        """
-        Stop
-        :return:
-        """
-        if self._running:
-            self._end = self.clock()
-            self._running = False
+        """Stop timer and add current measurement to total.
 
-    def elapsed(self):
-        """Return timed duration in nanoseconds.
+        :return: duration of the last measurement
+        :rtype: int, float
+        """
+        e = self.current_elapsed()
+        self._total += e
+        self._running = False
+        return e
+
+    def current_elapsed(self):
+        """Return duration of the current timer leg.
 
         If timer is running (no ``stop()`` has been called
         after last ``start()`` invocation),
-        duration elapsed from last start() call is returned.
+        duration elapsed from last ``start()`` call is returned.
 
-        Otherwise, duration between last consecutive calls to
-        ``start()`` and ``stop()`` is returned.
+        Otherwise, zero is returned.
 
-        :return: int
+        :return: duration after last call to ``start()`` or zero
+        :rtype: int, float
         """
-        if self._running:
-            return self.clock() - self._begin
-        else:
-            return self._end - self._begin
+        return self.clock() - self._begin if self._running else 0
+
+    def total_elapsed(self):
+        """Return total duration across all timer legs.
+
+        If timer is running (no ``stop()`` has been called
+        after last ``start()`` invocation),
+        duration of the current leg is also added to the total.
+
+        :return: sum of the measured legs
+        :rtype: int, float
+        """
+        return self._total + self.current_elapsed()
