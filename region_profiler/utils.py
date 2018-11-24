@@ -1,4 +1,7 @@
+import inspect
+import sys
 import time
+from collections import namedtuple
 
 
 class SeqStats:
@@ -14,6 +17,7 @@ class SeqStats:
     ``SeqStats`` does not store the sequence itself,
     statistics are calculated online.
     """
+
     def __init__(self):
         self.count = 0
         self.total = 0
@@ -66,6 +70,7 @@ class Timer:
     The duration can be retrieved using
     ``current_elapsed()`` and ``total_elapsed()``.
     """
+
     def __init__(self, clock=default_clock):
         """
         :param clock: functor, that returns current clock.
@@ -123,3 +128,25 @@ class Timer:
         :rtype: int, float
         """
         return self._total + self.current_elapsed()
+
+
+CallerInfo = namedtuple('CallerInfo', ['file', 'line', 'name'])
+
+
+def get_caller_info(stack_depth=1):
+    """Return caller function name and
+    call site filename and line number.
+
+    :param stack_depth: select caller frame to be inspected.
+                        - 0 corresponds to the call site of
+                          the ``get_caller_info()`` itself.
+                        - 1 corresponds to the call site of
+                          the parent function.
+    :return: information about caller
+    :rtype: CallerInfo
+
+    """
+    frame = inspect.stack()[stack_depth + 1]
+    info = CallerInfo(frame[1], frame[2], frame[3])
+    del frame  # prevents cycle reference
+    return info
