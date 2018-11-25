@@ -12,7 +12,7 @@ class RegionProfiler:
         self.node_stack = [self.root]
 
     @contextmanager
-    def mark(self, name):
+    def checkpoint(self, name):
         self.node_stack.append(self.current_node.get_child(name))
         self.current_node.enter_region()
         yield
@@ -30,8 +30,8 @@ class RegionProfiler:
 _profiler = RegionProfiler()
 
 
-def mark(name):
-    return _profiler.mark(name)
+def checkpoint(name):
+    return _profiler.checkpoint(name)
 
 
 def install():

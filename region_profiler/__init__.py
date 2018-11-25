@@ -13,6 +13,6 @@
 .. moduleauthor:: Viacheslav Kroilov <slavakroilov@gmail.com>
 """
 
-from .region_profiler import install, mark
+from .region_profiler import install, checkpoint
 
-__all__ = ['install', 'mark']
+__all__ = ['install', 'checkpoint']
