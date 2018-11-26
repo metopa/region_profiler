@@ -4,6 +4,7 @@ import atexit
 
 from region_profiler.node import RegionNode
 from region_profiler.utils import Timer
+from utils import get_name_by_callsite
 
 
 class RegionProfiler:
@@ -12,7 +13,9 @@ class RegionProfiler:
         self.node_stack = [self.root]
 
     @contextmanager
-    def checkpoint(self, name):
+    def checkpoint(self, name=None, indirect_call_depth=0):
+        if name is None:
+            name = get_name_by_callsite(indirect_call_depth + 2)
         self.node_stack.append(self.current_node.get_child(name))
         self.current_node.enter_region()
         yield
@@ -30,8 +33,8 @@ class RegionProfiler:
 _profiler = RegionProfiler()
 
 
-def checkpoint(name):
-    return _profiler.checkpoint(name)
+def checkpoint(name=None):
+    return _profiler.checkpoint(name, 1)
 
 
 def install():

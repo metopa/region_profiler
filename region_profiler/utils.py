@@ -1,4 +1,5 @@
 import inspect
+import os
 import sys
 import time
 from collections import namedtuple
@@ -150,3 +151,20 @@ def get_caller_info(stack_depth=1):
     info = CallerInfo(frame[1], frame[2], frame[3])
     del frame  # prevents cycle reference
     return info
+
+
+def get_name_by_callsite(stack_depth=1):
+    """Get string description of the call site
+    of the caller.
+
+    :param stack_depth: select caller frame to be inspected.
+                        - 0 corresponds to the call site of
+                          the ``get_caller_info()`` itself.
+                        - 1 corresponds to the call site of
+                          the parent function.
+    :return: 'function<filename:line>'
+    :rtype: str
+    """
+    info = get_caller_info(stack_depth + 1)
+    f = os.path.basename(info.file)
+    return '{} <{}:{}>'.format(info.name, f, info.line)
