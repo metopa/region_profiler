@@ -13,6 +13,6 @@
 .. moduleauthor:: Viacheslav Kroilov <slavakroilov@gmail.com>
 """
 
-from .region_profiler import install, region
+from .profiler import *
 
-__all__ = ['install', 'region']
+__all__ = ['install', 'region', 'func', 'RegionProfiler']

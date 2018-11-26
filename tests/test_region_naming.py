@@ -1,4 +1,4 @@
-from region_profiler.region_profiler import RegionProfiler
+from region_profiler.profiler import RegionProfiler
 
 
 def test_basic_naming():
@@ -29,6 +29,9 @@ def test_basic_naming():
 
 
 def test_automatic_naming():
+    """Test that region name is correctly deduced from the code location.
+    """
+
     def foo():
         with rp.region():
             pass
@@ -37,8 +40,54 @@ def test_automatic_naming():
 
     with rp.region():
         foo()
-    cp1 = 'test_automatic_naming <test_region_naming.py:38>'
-    cp2 = 'foo <test_region_naming.py:33>'
-    assert list(rp.root.children.keys()) == [cp1]
-    assert rp.root.children[cp1].name == cp1
-    assert list(rp.root.children[cp1].children.keys()) == [cp2]
+    r1 = 'test_automatic_naming <test_region_naming.py:41>'
+    r2 = 'foo <test_region_naming.py:36>'
+    assert list(rp.root.children.keys()) == [r1]
+    assert rp.root.children[r1].name == r1
+    assert list(rp.root.children[r1].children.keys()) == [r2]
+
+
+def test_func_decorator():
+    """Test that decorator properly wraps a function and
+    have a proper name.
+    """
+    rp = RegionProfiler()
+
+    @rp.func('foo')
+    def foo():
+        with rp.region('inner'):
+            return 42
+
+    @rp.func('baz')
+    def bar():
+        return foo() + foo()
+
+    x = bar() + foo()
+    ch = rp.root.children
+    assert set(ch.keys()) == {'foo', 'baz'}
+    assert set(ch['foo'].children.keys()) == {'inner'}
+    assert set(ch['baz'].children.keys()) == {'foo'}
+    assert set(ch['baz'].children['foo'].children.keys()) == {'inner'}
+
+
+def test_func_automatic_naming():
+    """Test that decorated region name is correctly
+    deduced from the code location.
+    """
+    rp = RegionProfiler()
+
+    @rp.func()
+    def foo():
+        with rp.region('inner'):
+            return 42
+
+    @rp.func()
+    def baz():
+        return foo() + foo()
+
+    x = baz() + foo()
+    ch = rp.root.children
+    assert set(ch.keys()) == {'foo', 'baz'}
+    assert set(ch['foo'].children.keys()) == {'inner'}
+    assert set(ch['baz'].children.keys()) == {'foo'}
+    assert set(ch['baz'].children['foo'].children.keys()) == {'inner'}

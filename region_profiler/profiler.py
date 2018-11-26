@@ -21,6 +21,19 @@ class RegionProfiler:
         self.current_node.exit_region()
         self.node_stack.pop()
 
+    def func(self, name=None):
+        def decorator(fn):
+            nonlocal name
+            if name is None:
+                name = fn.__name__
+
+            def wrapped(*args, **kwargs):
+                with self.region(name):
+                    return fn(*args, **kwargs)
+            return wrapped
+
+        return decorator
+
     def dump(self):
         self.root.dump()
 
@@ -32,9 +45,13 @@ class RegionProfiler:
 _profiler = RegionProfiler()
 
 
+def install():
+    atexit.register(lambda: _profiler.dump())
+
+
 def region(name=None):
     return _profiler.region(name, 1)
 
 
-def install():
-    atexit.register(lambda: _profiler.dump())
+def func(name=None):
+    return _profiler.func(name)
