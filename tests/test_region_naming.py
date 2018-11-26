@@ -7,13 +7,13 @@ def test_basic_naming():
     rp = RegionProfiler()
     assert rp.root.children == {}
 
-    with rp.checkpoint('a'):
-        with rp.checkpoint('b'):
+    with rp.region('a'):
+        with rp.region('b'):
             pass
 
         for n in ['c', 'd']:
-            with rp.checkpoint(n):
-                with rp.checkpoint('x'):
+            with rp.region(n):
+                with rp.region('x'):
                     pass
 
     children = rp.root.children
@@ -30,12 +30,12 @@ def test_basic_naming():
 
 def test_automatic_naming():
     def foo():
-        with rp.checkpoint():
+        with rp.region():
             pass
 
     rp = RegionProfiler()
 
-    with rp.checkpoint():
+    with rp.region():
         foo()
     cp1 = 'test_automatic_naming <test_region_naming.py:38>'
     cp2 = 'foo <test_region_naming.py:33>'

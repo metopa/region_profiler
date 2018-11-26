@@ -4,26 +4,26 @@ import region_profiler as rp
 
 
 def foo(n):
-    with rp.checkpoint(n):
-        with rp.checkpoint('sleep'):
+    with rp.region(n):
+        with rp.region('sleep'):
             sleep(0.5)
 
-        with rp.checkpoint('static_loop'):
+        with rp.region('static_loop'):
             for _ in range(1000):
-                with rp.checkpoint('outer'):
-                    with rp.checkpoint('inner'):
+                with rp.region('outer'):
+                    with rp.region('inner'):
                         pass
 
-        with rp.checkpoint('dynamic_loop'):
+        with rp.region('dynamic_loop'):
             for i in range(1000):
-                with rp.checkpoint('outer'):
-                    with rp.checkpoint('inner' + str(i % 10)):
+                with rp.region('outer'):
+                    with rp.region('inner' + str(i % 10)):
                         pass
 
-        with rp.checkpoint('static_loop'):
+        with rp.region('static_loop'):
             for _ in range(1000):
-                with rp.checkpoint('outer'):
-                    with rp.checkpoint('inner'):
+                with rp.region('outer'):
+                    with rp.region('inner'):
                         pass
 
 

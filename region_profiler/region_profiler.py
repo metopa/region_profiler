@@ -13,7 +13,7 @@ class RegionProfiler:
         self.node_stack = [self.root]
 
     @contextmanager
-    def checkpoint(self, name=None, indirect_call_depth=0):
+    def region(self, name=None, indirect_call_depth=0):
         if name is None:
             name = get_name_by_callsite(indirect_call_depth + 2)
         self.node_stack.append(self.current_node.get_child(name))
@@ -33,8 +33,8 @@ class RegionProfiler:
 _profiler = RegionProfiler()
 
 
-def checkpoint(name=None):
-    return _profiler.checkpoint(name, 1)
+def region(name=None):
+    return _profiler.region(name, 1)
 
 
 def install():
