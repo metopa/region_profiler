@@ -1,9 +1,10 @@
+import warnings
 from contextlib import contextmanager
 
 import atexit
 
 from region_profiler.node import RegionNode
-from region_profiler.utils import Timer, get_name_by_callsite
+from region_profiler.utils import Timer, get_name_by_callsite, NullContext, null_decorator
 
 
 class RegionProfiler:
@@ -30,6 +31,7 @@ class RegionProfiler:
             def wrapped(*args, **kwargs):
                 with self.region(name):
                     return fn(*args, **kwargs)
+
             return wrapped
 
         return decorator
@@ -42,16 +44,27 @@ class RegionProfiler:
         return self.node_stack[-1]
 
 
-_profiler = RegionProfiler()
+_profiler = None
 
 
 def install():
-    atexit.register(lambda: _profiler.dump())
+    global _profiler
+    if _profiler is None:
+        _profiler = RegionProfiler()
+        atexit.register(lambda: _profiler.dump())
+    else:
+        warnings.warn("region_profiler.install() must be called only once", stacklevel=2)
 
 
 def region(name=None):
-    return _profiler.region(name, 1)
+    if _profiler is not None:
+        return _profiler.region(name, 1)
+    else:
+        return NullContext()
 
 
 def func(name=None):
-    return _profiler.func(name)
+    if _profiler is not None:
+        return _profiler.func(name)
+    else:
+        return null_decorator()
