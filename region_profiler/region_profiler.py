@@ -3,8 +3,7 @@ from contextlib import contextmanager
 import atexit
 
 from region_profiler.node import RegionNode
-from region_profiler.utils import Timer
-from utils import get_name_by_callsite
+from region_profiler.utils import Timer, get_name_by_callsite
 
 
 class RegionProfiler:

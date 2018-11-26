@@ -1,4 +1,4 @@
-from utils import get_caller_info
+from region_profiler.utils import get_caller_info
 
 
 def func_a(tester):
