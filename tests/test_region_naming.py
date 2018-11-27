@@ -2,7 +2,7 @@ from region_profiler.profiler import RegionProfiler
 
 
 def test_basic_naming():
-    """Test basic checkpoint naming is kept.
+    """Test basic checkpoint naming works.
     """
     rp = RegionProfiler()
     assert rp.root.children == {}

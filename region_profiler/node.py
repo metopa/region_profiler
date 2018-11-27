@@ -17,12 +17,14 @@ class RegionNode:
 
         self.timer.start()
 
-    def exit_region(self):
-        assert self.timer is not None, \
-            'exit_region() must be called when region is entered'
-        self.timer.stop()
-        self.stats.add(self.timer.total_elapsed())
+    def cancel_region(self):
         self.timer = None
+
+    def exit_region(self):
+        if self.timer is not None:
+            self.timer.stop()
+            self.stats.add(self.timer.total_elapsed())
+            self.timer = None
 
     def get_child(self, name, timer_cls=None):
         try:

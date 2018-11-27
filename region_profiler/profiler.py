@@ -10,6 +10,7 @@ from region_profiler.utils import Timer, get_name_by_callsite, NullContext, null
 class RegionProfiler:
     def __init__(self, timer_cls=Timer):
         self.root = RegionNode('<main>', timer_cls=timer_cls)
+        self.root.enter_region()
         self.node_stack = [self.root]
 
     @contextmanager
@@ -18,7 +19,7 @@ class RegionProfiler:
             name = get_name_by_callsite(indirect_call_depth + 2)
         self.node_stack.append(self.current_node.get_child(name))
         self.current_node.enter_region()
-        yield
+        yield self.current_node
         self.current_node.exit_region()
         self.node_stack.pop()
 
@@ -35,6 +36,26 @@ class RegionProfiler:
             return wrapped
 
         return decorator
+
+    def iter_proxy(self, iterable, name=None, indirect_call_depth=0):
+        it = iter(iterable)
+        if name is None:
+            name = get_name_by_callsite(indirect_call_depth + 2)
+
+        self.node_stack.append(self.current_node.get_child(name))
+        try:
+            while True:
+                self.current_node.enter_region()
+                try:
+                    x = next(it)
+                except StopIteration as e:
+                    self.current_node.cancel_region()
+                    return
+                self.current_node.exit_region()
+                yield x
+        finally:
+            self.current_node.exit_region()
+            self.node_stack.pop()
 
     def dump(self):
         self.root.dump()
@@ -68,3 +89,10 @@ def func(name=None):
         return _profiler.func(name)
     else:
         return null_decorator()
+
+
+def iter_proxy(iterable, name=None):
+    if _profiler is not None:
+        return _profiler.iter_proxy(iterable, name, 1)
+    else:
+        return iterable
