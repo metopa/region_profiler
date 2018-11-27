@@ -5,7 +5,7 @@ with open('README.rst') as f:
 
 setup(
     name='region_profiler',
-    version='0.1.1',
+    version='0.2.0',
     description='Profile user-defined regions of code without any external tools',
     long_description=long_description,
     packages=['region_profiler'],
