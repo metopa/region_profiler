@@ -10,7 +10,6 @@ from region_profiler.utils import Timer, get_name_by_callsite, NullContext, null
 class RegionProfiler:
     def __init__(self, timer_cls=Timer):
         self.root = RegionNode('<main>', timer_cls=timer_cls)
-        self.root.enter_region()
         self.node_stack = [self.root]
 
     @contextmanager
@@ -58,6 +57,7 @@ class RegionProfiler:
             self.node_stack.pop()
 
     def dump(self):
+        print('', end='', flush=True)
         self.root.dump()
 
     @property
@@ -72,14 +72,16 @@ def install():
     global _profiler
     if _profiler is None:
         _profiler = RegionProfiler()
+        _profiler.root.enter_region()
         atexit.register(lambda: _profiler.dump())
+        atexit.register(lambda: _profiler.root.exit_region())
     else:
         warnings.warn("region_profiler.install() must be called only once", stacklevel=2)
 
 
 def region(name=None):
     if _profiler is not None:
-        return _profiler.region(name, 1)
+        return _profiler.region(name, 0)
     else:
         return NullContext()
 
@@ -93,6 +95,6 @@ def func(name=None):
 
 def iter_proxy(iterable, name=None):
     if _profiler is not None:
-        return _profiler.iter_proxy(iterable, name, 1)
+        return _profiler.iter_proxy(iterable, name, -1)
     else:
         return iterable

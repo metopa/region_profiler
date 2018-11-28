@@ -1,4 +1,5 @@
 import sys
+from collections import OrderedDict
 
 from region_profiler.utils import SeqStats, Timer
 
@@ -9,7 +10,7 @@ class RegionNode:
         self.timer = None
         self.stats = SeqStats()
         self.timer_cls = timer_cls
-        self.children = {}
+        self.children = OrderedDict()
 
     def enter_region(self):
         if self.timer is None:

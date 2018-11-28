@@ -15,4 +15,4 @@
 
 from .profiler import *
 
-__all__ = ['install', 'region', 'func', 'RegionProfiler']
+__all__ = ['install', 'region', 'func', 'iter_proxy', 'RegionProfiler']
