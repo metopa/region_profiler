@@ -13,3 +13,13 @@
            span from a whole function call to a single
            statement to single iteration inside a loop.
 :Author: Viacheslav Kroilov <slavakroilov@gmail.com>
+
+:TODO: - Append region mode
+       - Region labels
+           - Track func arguments
+           - Track separate iterations
+       - Support Chrome Trace
+       - Export as CSV
+       - Better dump
+       - Fix decorator called before ``install()``
+
