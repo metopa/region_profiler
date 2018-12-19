@@ -6,13 +6,37 @@
   :target: https://codecov.io/gh/metopa/region_profiler
 
 :Synopsis: Profile user-defined regions of code without
-           any external tools. Explicitly defined regions
-           are specified by its name, so you can profile
-           the same snippet as different regions under
-           different conditions. Regions can
-           span from a whole function call to a single
-           statement to single iteration inside a loop.
+           any external tools. Explicitly defined
 :Author: Viacheslav Kroilov <slavakroilov@gmail.com>
+:Description: Region Profiler allows you to time execution of Python code snippets.
+     Measured snippets are called regions. A region
+     is specified by its name, so you can profile
+     the same snippet as different regions under
+     different conditions. Regions can
+     span from a whole function call to a single
+     statement to single iteration inside a loop.
+     You can mark any part of code
+     as a region, including internal routines of some third-party package.
+
+     In contrary to majority of existing profilers,
+     Region Profiler does not require any special programs/switches
+     (like kernprof) for application start. In addition, the final report
+     contains information only about user-defined regions --
+     if we are investigation some complicated framework, we don't need to
+     see/learn its internals outside of the scope of interest.
+
+     This tool is extremely useful when investigating bottlenecks
+     of bigger applications, that has complicated start process
+     (e.g. distributed NN trainer, that is run on a cluster using MPI).
+
+     Basic usage example is there:
+     https://github.com/metopa/region_profiler/blob/master/examples/example2.py
+
+     Additional features:
+
+     - Real-time Chrome trace export
+     - Speed up profiling with Cython module
+     - CSV/human-readable summary export
 
 :TODO: - Append region mode
        - Region labels
