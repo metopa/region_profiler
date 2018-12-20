@@ -40,8 +40,8 @@ def test_automatic_naming():
 
     with rp.region():
         foo()
-    r1 = 'test_automatic_naming <test_region_naming.py:41>'
-    r2 = 'foo <test_region_naming.py:36>'
+    r1 = 'test_automatic_naming() <test_region_naming.py:41>'
+    r2 = 'foo() <test_region_naming.py:36>'
     assert list(rp.root.children.keys()) == [r1]
     assert rp.root.children[r1].name == r1
     assert list(rp.root.children[r1].children.keys()) == [r2]
@@ -64,10 +64,10 @@ def test_func_decorator():
 
     x = bar() + foo()
     ch = rp.root.children
-    assert set(ch.keys()) == {'foo', 'baz'}
-    assert set(ch['foo'].children.keys()) == {'inner'}
-    assert set(ch['baz'].children.keys()) == {'foo'}
-    assert set(ch['baz'].children['foo'].children.keys()) == {'inner'}
+    assert set(ch.keys()) == {'foo()', 'baz()'}
+    assert set(ch['foo()'].children.keys()) == {'inner'}
+    assert set(ch['baz()'].children.keys()) == {'foo()'}
+    assert set(ch['baz()'].children['foo()'].children.keys()) == {'inner'}
 
 
 def test_func_automatic_naming():
@@ -87,7 +87,7 @@ def test_func_automatic_naming():
 
     x = baz() + foo()
     ch = rp.root.children
-    assert set(ch.keys()) == {'foo', 'baz'}
-    assert set(ch['foo'].children.keys()) == {'inner'}
-    assert set(ch['baz'].children.keys()) == {'foo'}
-    assert set(ch['baz'].children['foo'].children.keys()) == {'inner'}
+    assert set(ch.keys()) == {'foo()', 'baz()'}
+    assert set(ch['foo()'].children.keys()) == {'inner'}
+    assert set(ch['baz()'].children.keys()) == {'foo()'}
+    assert set(ch['baz()'].children['foo()'].children.keys()) == {'inner'}

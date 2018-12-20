@@ -166,7 +166,7 @@ def get_name_by_callsite(stack_depth=1):
     """
     info = get_caller_info(stack_depth + 1)
     f = os.path.basename(info.file)
-    return '{} <{}:{}>'.format(info.name, f, info.line)
+    return '{}() <{}:{}>'.format(info.name, f, info.line)
 
 
 class NullContext:

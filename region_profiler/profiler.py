@@ -29,6 +29,8 @@ class RegionProfiler:
             if name is None:
                 name = fn.__name__
 
+            name += '()'
+
             def wrapped(*args, **kwargs):
                 with self.region(name):
                     return fn(*args, **kwargs)

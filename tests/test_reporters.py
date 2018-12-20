@@ -1,3 +1,4 @@
+from region_profiler import RegionProfiler
 from region_profiler.reporters import *
 
 
@@ -47,11 +48,5 @@ def test_slice_generation():
 
     slices = get_profiler_slice(rp)
     assert slices == expected
-    ConsoleReporter().print_summary(rp)
-    CsvReporter().print_summary(rp)
-
-
-if __name__ == '__main__':
-    test_slice_generation()
 
 
