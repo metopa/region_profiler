@@ -1,5 +1,5 @@
 import sys
-from collections import OrderedDict
+import warnings
 
 from region_profiler.utils import SeqStats, Timer
 
@@ -10,7 +10,7 @@ class RegionNode:
         self.timer = None
         self.stats = SeqStats()
         self.timer_cls = timer_cls
-        self.children = OrderedDict()
+        self.children = dict()
 
     def enter_region(self):
         if self.timer is None:
@@ -44,4 +44,38 @@ class RegionNode:
             c.dump(depth + 1)
 
     def __str__(self):
-        return self.name or '<root>'
+        return self.name or '???'
+
+
+class _RootNodeStats:
+    def __init__(self, timer):
+        self.timer = timer
+
+    @property
+    def count(self):
+        return 1
+
+    @property
+    def total(self):
+        return self.timer.total_elapsed()
+
+    @property
+    def min(self):
+        return self.total
+
+    @property
+    def max(self):
+        return self.total
+
+
+class RootNode(RegionNode):
+    def __init__(self, timer_cls=Timer):
+        super(RootNode, self).__init__('<root>', timer_cls)
+        self.timer = timer_cls()
+        self.stats = _RootNodeStats(self.timer)
+
+    def cancel_region(self):
+        warnings.warn('Can\'t cancel root region timer', stacklevel=2)
+
+    def exit_region(self):
+        self.timer.stop()

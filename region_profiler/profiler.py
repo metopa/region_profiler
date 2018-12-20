@@ -3,13 +3,13 @@ from contextlib import contextmanager
 
 import atexit
 
-from region_profiler.node import RegionNode
+from region_profiler.node import RootNode
 from region_profiler.utils import Timer, get_name_by_callsite, NullContext, null_decorator
 
 
 class RegionProfiler:
     def __init__(self, timer_cls=Timer):
-        self.root = RegionNode('<main>', timer_cls=timer_cls)
+        self.root = RootNode(timer_cls=timer_cls)
         self.node_stack = [self.root]
 
     @contextmanager
