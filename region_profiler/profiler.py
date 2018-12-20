@@ -4,6 +4,7 @@ from contextlib import contextmanager
 import atexit
 
 from region_profiler.node import RootNode
+from region_profiler.reporters import ConsoleReporter
 from region_profiler.utils import Timer, get_name_by_callsite, NullContext, null_decorator
 
 
@@ -68,12 +69,12 @@ class RegionProfiler:
 _profiler = None
 
 
-def install():
+def install(reporter=ConsoleReporter()):
     global _profiler
     if _profiler is None:
         _profiler = RegionProfiler()
         _profiler.root.enter_region()
-        atexit.register(lambda: _profiler.dump())
+        atexit.register(lambda: reporter.print_summary(_profiler))
         atexit.register(lambda: _profiler.root.exit_region())
     else:
         warnings.warn("region_profiler.install() must be called only once", stacklevel=2)
