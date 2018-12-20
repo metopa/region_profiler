@@ -179,3 +179,18 @@ class NullContext:
 
 def null_decorator():
     return lambda fn: fn
+
+
+def pretty_print_time(sec):
+    for unit in ('s', 'ms', 'us'):
+        if sec >= 500:
+            return '{:.0f} {}'.format(sec, unit)
+        if sec >= 100:
+            return '{:.1f} {}'.format(sec, unit)
+        if sec >= 10:
+            return '{:.2f} {}'.format(sec, unit)
+        if sec >= 1:
+            return '{:.3f} {}'.format(sec, unit)
+        sec *= 1000
+
+    return '{} ns'.format(sec)
