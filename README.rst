@@ -4,9 +4,11 @@
     :target: https://travis-ci.com/metopa/region_profiler
 .. image:: https://codecov.io/gh/metopa/region_profiler/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/metopa/region_profiler
+.. image:: https://readthedocs.org/projects/region-profiler/badge/?version=latest
+:target: https://region-profiler.readthedocs.io/en/latest/?badge=latest
+:alt: Documentation Status
 
-:Synopsis: Profile user-defined regions of code without
-           any external tools. Explicitly defined
+:Synopsis: Effortlessly profile user-defined regions of code.
 :Author: Viacheslav Kroilov <slavakroilov@gmail.com>
 :Description: Region Profiler allows you to time execution of Python code snippets.
      Measured snippets are called regions. A region
