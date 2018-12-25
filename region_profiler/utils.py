@@ -7,14 +7,14 @@ from collections import namedtuple
 class SeqStats:
     """Helper class for calculating online stats of a number sequence.
 
-    ``SeqStats`` records the following parameters of a number sequence:
+    :py:class:`SeqStats` records the following parameters of a number sequence:
       - element count
       - sum
       - average
       - min value
       - max value
 
-    ``SeqStats`` does not store the sequence itself,
+    :py:class:`SeqStats` does not store the sequence itself,
     statistics are calculated online.
     """
 
@@ -25,10 +25,10 @@ class SeqStats:
         self.max = max
 
     def add(self, x):
-        """
-        Update statistics with the next value of a sequence.
+        """Update statistics with the next value of a sequence.
 
-        :param x: value to be considered
+        Args:
+            x (number): next value in the sequence
         """
         self.count += 1
         self.total += x
@@ -37,9 +37,7 @@ class SeqStats:
 
     @property
     def avg(self):
-        """
-        Calculate sequence average.
-        :return: float
+        """Calculate sequence average.
         """
         return 0 if self.count == 0 else self.total / self.count
 
@@ -58,30 +56,30 @@ class SeqStats:
 
 def default_clock():
     """Default clock provider for Timer class.
-    :return: value (in fractional seconds) of a performance counter
-    :rtype: float
+
+    Returns:
+        float: value (in fractional seconds) of a performance counter
     """
     return time.perf_counter()
 
 
 class Timer:
-    """
-    Simple timer.
+    """Simple timer.
 
     Allows to measure duration
-    between ``start`` and ``stop`` events.
+    between `start` and `stop` events.
 
-    By default, measurement is done with seconds precision.
-    This can be changed by providing a different clock as
-    ``__init__`` parameter.
+    By default, measurement is done with a second scale.
+    This can be changed by providing a different clock in constructor.
 
     The duration can be retrieved using
-    ``current_elapsed()`` and ``total_elapsed()``.
+    :py:meth:`current_elapsed` or :py:meth:`total_elapsed()`.
     """
 
     def __init__(self, clock=default_clock):
         """
-        :param clock: functor, that returns current clock.
+        Args:
+            clock(function): functor, that returns current clock.
                       Measurements have the same precision as the clock
         """
         self.clock = clock
@@ -100,8 +98,8 @@ class Timer:
     def stop(self):
         """Stop timer and add current measurement to total.
 
-        :return: duration of the last measurement
-        :rtype: int, float
+        Returns:
+            int or float: duration of the last measurement
         """
         e = self.current_elapsed()
         self._total += e
@@ -109,31 +107,36 @@ class Timer:
         return e
 
     def is_running(self):
+        """Check if timer is currently running.
+
+        Returns:
+            bool:
+        """
         return self._running
 
     def current_elapsed(self):
         """Return duration of the current timer leg.
 
-        If timer is running (no ``stop()`` has been called
-        after last ``start()`` invocation),
-        duration elapsed from last ``start()`` call is returned.
+        If timer is running (no :py:meth:`stop` has been called
+        after last :py:meth:`start` invocation),
+        duration elapsed from last :py:meth:`start` call is returned.
 
         Otherwise, zero is returned.
 
-        :return: duration after last call to ``start()`` or zero
-        :rtype: int, float
+        Returns:
+            int or float: duration after last call to :py:meth:`start` or zero
         """
         return self.clock() - self._begin if self.is_running() else 0
 
     def total_elapsed(self):
         """Return total duration across all timer legs.
 
-        If timer is running (no ``stop()`` has been called
-        after last ``start()`` invocation),
+        If timer is running (no :py:meth:`stop` has been called
+        after last :py:meth:`start` invocation),
         duration of the current leg is also added to the total.
 
-        :return: sum of the measured legs
-        :rtype: int, float
+        Returns:
+            int or float: sum of the measured legs
         """
         return self._total + self.current_elapsed()
 
@@ -142,18 +145,20 @@ CallerInfo = namedtuple('CallerInfo', ['file', 'line', 'name'])
 
 
 def get_caller_info(stack_depth=1):
-    """Return caller function name and
+    """
+    Return caller function name and
     call site filename and line number.
 
-    :param stack_depth: select caller frame to be inspected.
+    Args:
+        stack_depth (int): select caller frame to be inspected.
 
                         - 0 corresponds to the call site of
-                          the ``get_caller_info()`` itself.
+                          the :py:func:`get_caller_info` itself.
                         - 1 corresponds to the call site of
                           the parent function.
 
-    :return: information about caller
-    :rtype: CallerInfo
+    Returns:
+        CallerInfo:  information about the caller
 
     """
     frame = inspect.stack()[stack_depth + 1]
@@ -166,15 +171,16 @@ def get_name_by_callsite(stack_depth=1):
     """Get string description of the call site
     of the caller.
 
-    :param stack_depth: select caller frame to be inspected.
+    Args:
+        stack_depth: select caller frame to be inspected.
 
                         - 0 corresponds to the call site of
-                          the ``get_name_by_callsite()`` itself.
+                          the :py:meth:`get_name_by_callsite` itself.
                         - 1 corresponds to the call site of
                           the parent function.
 
-    :return: 'function<filename:line>'
-    :rtype: str
+    Returns:
+        str: string in the following format: ``'function<filename:line>'``
     """
     info = get_caller_info(stack_depth + 1)
     f = os.path.basename(info.file)
@@ -182,6 +188,8 @@ def get_name_by_callsite(stack_depth=1):
 
 
 class NullContext:
+    """Empty context manager.
+    """
     def __enter__(self):
         pass
 
@@ -190,10 +198,26 @@ class NullContext:
 
 
 def null_decorator():
+    """Empty decorator.
+    """
     return lambda fn: fn
 
 
 def pretty_print_time(sec):
+    """Get duration as a human-readable string.
+
+    Examples:
+
+        - 10.044 => '10.04 s'
+        - 0.13244 => '132.4 ms'
+        - 0.0000013244 => '1.324 us'
+
+    Args:
+        sec (float): duration in fractional seconds scale
+
+    Returns:
+        str: human-readable string representation as shown above.
+    """
     for unit in ('s', 'ms', 'us'):
         if sec >= 500:
             return '{:.0f} {}'.format(sec, unit)

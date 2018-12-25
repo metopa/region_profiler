@@ -1,8 +1,8 @@
 """Define columns that may be used for configuring reporters
-(see :py:mod:`region_profiler.reporter_columns`).
+(see :py:mod:`region_profiler.reporters`).
 
 Each column is defined as a function, that takes a current
-:py:class:`region_profiler.reporter_columns.Slice` and a list
+:py:class:`region_profiler.reporters.Slice` and a list
 of all slices and returns the requested metrics of the current slice.
 
 Each column stores its name in ``column_name`` attribute.
