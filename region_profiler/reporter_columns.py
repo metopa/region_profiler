@@ -92,12 +92,3 @@ def max_us(this_slice, all_slices):
 @as_column()
 def max(this_slice, all_slices):
     return pretty_print_time(this_slice.max_time)
-
-
-
-
-
-
-
-
-

@@ -1,14 +1,15 @@
+import atexit
 import warnings
 from contextlib import contextmanager
 
-import atexit
-
 from region_profiler.node import RootNode
 from region_profiler.reporters import ConsoleReporter
-from region_profiler.utils import Timer, get_name_by_callsite, NullContext, null_decorator
+from region_profiler.utils import (NullContext, Timer, get_name_by_callsite,
+                                   null_decorator)
 
 
 class RegionProfiler:
+
     def __init__(self, timer_cls=Timer):
         self.root = RootNode(timer_cls=timer_cls)
         self.node_stack = [self.root]
