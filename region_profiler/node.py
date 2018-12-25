@@ -121,9 +121,9 @@ class RootNode(RegionNode):
     returning the current measurement values instead of
     the real stats of previous measurements.
     """
-    def __init__(self, timer_cls=Timer):
-        super(RootNode, self).__init__('<root>', timer_cls)
-        self.timer = timer_cls()
+    def __init__(self, name='<root>', timer_cls=Timer):
+        super(RootNode, self).__init__(name, timer_cls)
+        self.enter_region()
         self.stats = _RootNodeStats(self.timer)
 
     def cancel_region(self):

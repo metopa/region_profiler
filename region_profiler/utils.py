@@ -51,6 +51,10 @@ class SeqStats:
         return ('SeqStats(count={}, total={}, min={}, max={})'
                 .format(self.count, self.total, self.min, self.max))
 
+    def __eq__(self, other):
+        return (self.total == other.total and self.count == other.count and
+                self.min == other.min and self.max == other.max)
+
 
 def default_clock():
     """Default clock provider for Timer class.
