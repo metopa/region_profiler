@@ -3,10 +3,10 @@
 .. image:: https://travis-ci.com/metopa/region_profiler.svg?branch=master
     :target: https://travis-ci.com/metopa/region_profiler
 .. image:: https://codecov.io/gh/metopa/region_profiler/branch/master/graph/badge.svg
-  :target: https://codecov.io/gh/metopa/region_profiler
+    :target: https://codecov.io/gh/metopa/region_profiler
 .. image:: https://readthedocs.org/projects/region-profiler/badge/?version=latest
-:target: https://region-profiler.readthedocs.io/en/latest/?badge=latest
-:alt: Documentation Status
+    :target: https://region-profiler.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 
 :Synopsis: Effortlessly profile user-defined regions of code.
 :Author: Viacheslav Kroilov <slavakroilov@gmail.com>
