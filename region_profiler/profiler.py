@@ -9,13 +9,49 @@ from region_profiler.utils import (NullContext, Timer, get_name_by_callsite,
 
 
 class RegionProfiler:
+    """:py:class:`RegionProfiler` handles code regions profiling.
 
+    This is the central class in :py:mod:`region_profiler` package.
+    It is responsible for maintaining the hierarchy of timed regions
+    as well as providing facilities for marking regions for timing
+    using
+
+      - ``with``-statement (:py:meth:`RegionProfiler.region`)
+      - function decorator (:py:meth:`RegionProfiler.func`)
+      - an iterator proxy (:py:meth:`RegionProfiler.iter_proxy`)
+
+    Normally it is expected that the global instance of
+    :py:class:`RegionProfiler` is used for the profiling,
+    see package-level function :py:func:`region_profiler.install`,
+    :py:func:`region_profiler.region`, :py:func:`region_profiler.func`,
+    and :py:func:`region_profiler.iter_proxy`.
+
+    Todo:
+        Code examples
+    """
     def __init__(self, timer_cls=Timer):
+        """Construct new :any:`RegionProfiler`.
+
+        Args:
+            timer_cls (:obj:`class`, optional): class, used for creating timers.
+                Default: ``region_profiler.utils.Timer``
+        """
         self.root = RootNode(timer_cls=timer_cls)
         self.node_stack = [self.root]
 
     @contextmanager
     def region(self, name=None, indirect_call_depth=0):
+        """Start new region in the current context.
+
+        
+
+        Args:
+            name:
+            indirect_call_depth:
+
+        Returns:
+
+        """
         if name is None:
             name = get_name_by_callsite(indirect_call_depth + 2)
         self.node_stack.append(self.current_node.get_child(name))
@@ -80,6 +116,7 @@ def install(reporter=ConsoleReporter()):
 
 
 def region(name=None):
+    """xxxxx"""
     if _profiler is not None:
         return _profiler.region(name, 0)
     else:
