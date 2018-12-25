@@ -142,10 +142,12 @@ def get_caller_info(stack_depth=1):
     call site filename and line number.
 
     :param stack_depth: select caller frame to be inspected.
+
                         - 0 corresponds to the call site of
                           the ``get_caller_info()`` itself.
                         - 1 corresponds to the call site of
                           the parent function.
+
     :return: information about caller
     :rtype: CallerInfo
 
@@ -161,10 +163,12 @@ def get_name_by_callsite(stack_depth=1):
     of the caller.
 
     :param stack_depth: select caller frame to be inspected.
+
                         - 0 corresponds to the call site of
                           the ``get_name_by_callsite()`` itself.
                         - 1 corresponds to the call site of
                           the parent function.
+
     :return: 'function<filename:line>'
     :rtype: str
     """
