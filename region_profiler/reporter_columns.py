@@ -1,7 +1,22 @@
+"""Define columns that may be used for configuring reporters
+(see :py:mod:`region_profiler.reporter_columns`).
+
+Each column is defined as a function, that takes a current
+:py:class:`region_profiler.reporter_columns.Slice` and a list
+of all slices and returns the requested metrics of the current slice.
+
+Each column stores its name in ``column_name`` attribute.
+"""
+
 from region_profiler.utils import pretty_print_time
 
 
 def as_column(name=None):
+    """Mark a function as a column provider.
+
+    Args:
+        name (:obj:`str`, optional): column name. If None, function name is used
+    """
     def decorate(func):
         setattr(func, 'column_name', name or func.__name__)
         return func
@@ -34,7 +49,7 @@ def parent_name(this_slice, all_slices):
 
 
 @as_column('% of total')
-def percent_of_whole(this_slice, all_slices):
+def percents_of_total(this_slice, all_slices):
     p = this_slice.total_time * 100. / all_slices[0].total_time
     return '{:.2f}%'.format(p)
 

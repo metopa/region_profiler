@@ -67,7 +67,7 @@ def get_profiler_slice(rp):
 
 
 DEFAULT_CONSOLE_COLUMNS = (cols.indented_name, cols.total,
-                           cols.percent_of_whole, cols.count,
+                           cols.percents_of_total, cols.count,
                            cols.min, cols.average, cols.max)
 
 

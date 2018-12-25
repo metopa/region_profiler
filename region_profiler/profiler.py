@@ -43,8 +43,6 @@ class RegionProfiler:
     def region(self, name=None, indirect_call_depth=0):
         """Start new region in the current context.
 
-        
-
         Args:
             name:
             indirect_call_depth:
@@ -61,6 +59,14 @@ class RegionProfiler:
         self.node_stack.pop()
 
     def func(self, name=None):
+        """
+
+        Args:
+            name:
+
+        Returns:
+
+        """
         def decorator(fn):
             nonlocal name
             if name is None:
@@ -77,6 +83,16 @@ class RegionProfiler:
         return decorator
 
     def iter_proxy(self, iterable, name=None, indirect_call_depth=0):
+        """
+
+        Args:
+            iterable:
+            name:
+            indirect_call_depth:
+
+        Returns:
+
+        """
         it = iter(iterable)
         if name is None:
             name = get_name_by_callsite(indirect_call_depth + 2)
@@ -98,13 +114,28 @@ class RegionProfiler:
 
     @property
     def current_node(self):
+        """
+
+        Returns:
+
+        """
         return self.node_stack[-1]
 
 
 _profiler = None
+"""
+"""
 
 
 def install(reporter=ConsoleReporter()):
+    """
+
+    Args:
+        reporter:
+
+    Returns:
+
+    """
     global _profiler
     if _profiler is None:
         _profiler = RegionProfiler()
@@ -116,7 +147,14 @@ def install(reporter=ConsoleReporter()):
 
 
 def region(name=None):
-    """xxxxx"""
+    """
+
+    Args:
+        name:
+
+    Returns:
+
+    """
     if _profiler is not None:
         return _profiler.region(name, 0)
     else:
@@ -124,6 +162,14 @@ def region(name=None):
 
 
 def func(name=None):
+    """
+
+    Args:
+        name:
+
+    Returns:
+
+    """
     if _profiler is not None:
         return _profiler.func(name)
     else:
@@ -131,6 +177,15 @@ def func(name=None):
 
 
 def iter_proxy(iterable, name=None):
+    """
+
+    Args:
+        iterable:
+        name:
+
+    Returns:
+
+    """
     if _profiler is not None:
         return _profiler.iter_proxy(iterable, name, -1)
     else:
