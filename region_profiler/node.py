@@ -1,4 +1,3 @@
-import sys
 import warnings
 
 from region_profiler.utils import SeqStats, Timer
@@ -10,15 +9,15 @@ class RegionNode:
     It contains a builtin timer for measuring the time, spent
     in the corresponding region. It keeps a track of
     the count, sum, max and min measurements.
-    These statistics can be accessed through ``stats`` attribute.
+    These statistics can be accessed through :py:attr:`stats` attribute.
 
     In addition, RegionNode has a dictionary of its children.
-    They are expected to be retrieved with ``get_child`` method,
-    that creates a new child if necessary.
+    They are expected to be retrieved using :py:meth:`get_child`,
+    that also creates a new child if necessary.
 
     Attributes:
-        name (str): node name
-        stats (SeqStats): measurement statistics
+        name (str): Node name.
+        stats (SeqStats): Measurement statistics.
     """
     def __init__(self, name, timer_cls=Timer):
         """Create new instance of ``RegionNode`` with the given name.
@@ -45,7 +44,7 @@ class RegionNode:
     def cancel_region(self):
         """Cancel current region timing.
 
-        Do not update measurement stats.
+        Stats will not be updated with the current measurement.
         """
         self.timer = None
 
@@ -65,7 +64,7 @@ class RegionNode:
 
         Args:
             name (str): child name
-            timer_cls (class, optional): override child timer class
+            timer_cls (:obj:`class`, optional): override child timer class
 
         Returns:
             RegionNode: new or existing child node with the given name
@@ -87,10 +86,10 @@ class RegionNode:
 
 class _RootNodeStats:
     """Proxy object that wraps timer in the
-    ``region_profiler.utils.SeqStats`` interface.
+    :py:class:`region_profiler.utils.SeqStats` interface.
 
     Timer is expected to have the same interface as
-    ``region_profiler.utils.Timer`` object.
+    :py:class:`region_profiler.utils.Timer` object.
     Proxy properties return current timer values.
     """
     def __init__(self, timer):
@@ -114,13 +113,13 @@ class _RootNodeStats:
 
 
 class RootNode(RegionNode):
-    """An instance of ``RootNode`` is intended to be used
+    """An instance of :any:`RootNode` is intended to be used
     as the root of a region node hierarchy.
 
-    ``RootNode`` differs from ``RegionNode``
-    by making ``stats`` property returning the current
-    measurement values instead of a real stats
-    of previous measurements.
+    :any:`RootNode` differs from :any:`RegionNode`
+    by making :py:attr:`RegionNode.stats` property
+    returning the current measurement values instead of
+    the real stats of previous measurements.
     """
     def __init__(self, timer_cls=Timer):
         super(RootNode, self).__init__('<root>', timer_cls)
@@ -133,7 +132,7 @@ class RootNode(RegionNode):
         warnings.warn('Can\'t cancel root region timer', stacklevel=2)
 
     def exit_region(self):
-        """Instead of :meth:`RegionNode.exit_region` it does not reset
-        ``timer`` attribute thus allowing it to continue timing on reenter.
+        """Instead of :py:meth:`RegionNode.exit_region` it does not reset
+        :py:attr:`timer` attribute thus allowing it to continue timing on reenter.
         """
         self.timer.stop()
