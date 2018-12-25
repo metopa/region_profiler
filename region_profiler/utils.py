@@ -18,11 +18,11 @@ class SeqStats:
     statistics are calculated online.
     """
 
-    def __init__(self):
-        self.count = 0
-        self.total = 0
-        self.max = 0
-        self.min = 0
+    def __init__(self, count=0, total=0, min=0, max=0):
+        self.count = count
+        self.total = total
+        self.min = min
+        self.max = max
 
     def add(self, x):
         """
@@ -46,6 +46,10 @@ class SeqStats:
     def __str__(self):
         return 'SeqStats{{{}..{}..{}/{}}}'.format(self.min, self.avg,
                                                   self.max, self.count)
+
+    def __repr__(self):
+        return ('SeqStats(count={}, total={}, min={}, max={})'
+                .format(self.count, self.total, self.min, self.max))
 
 
 def default_clock():

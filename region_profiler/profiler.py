@@ -59,10 +59,6 @@ class RegionProfiler:
             self.current_node.exit_region()
             self.node_stack.pop()
 
-    def dump(self):
-        print('', end='', flush=True)
-        self.root.dump()
-
     @property
     def current_node(self):
         return self.node_stack[-1]
