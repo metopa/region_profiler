@@ -27,5 +27,5 @@ def test_column_data():
     assert cols.average_us(s, slices) == '3000000'
     assert cols.min(s, slices) == '1.000 s'
     assert cols.min_us(s, slices) == '1000000'
-    assert cols.max(s, slices) == '4.000 s'
+    assert cols.max(s, slices) == '4.000 s '
     assert cols.max_us(s, slices) == '4000000'

@@ -13,6 +13,6 @@
 .. moduleauthor:: Viacheslav Kroilov <slavakroilov@gmail.com>
 """
 
-from .profiler import *
+from region_profiler.profiler import *
 
 __all__ = ['install', 'region', 'func', 'iter_proxy', 'RegionProfiler']

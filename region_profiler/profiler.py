@@ -29,6 +29,7 @@ class RegionProfiler:
     Todo:
         Code examples
     """
+
     def __init__(self, timer_cls=Timer):
         """Construct new :any:`RegionProfiler`.
 
@@ -67,6 +68,7 @@ class RegionProfiler:
         Returns:
 
         """
+
         def decorator(fn):
             nonlocal name
             if name is None:
@@ -123,8 +125,6 @@ class RegionProfiler:
 
 
 _profiler = None
-"""
-"""
 
 
 def install(reporter=ConsoleReporter()):
@@ -140,7 +140,7 @@ def install(reporter=ConsoleReporter()):
     if _profiler is None:
         _profiler = RegionProfiler()
         _profiler.root.enter_region()
-        atexit.register(lambda: reporter.print_summary(_profiler))
+        atexit.register(lambda: reporter.dump_profiler(_profiler))
         atexit.register(lambda: _profiler.root.exit_region())
     else:
         warnings.warn("region_profiler.install() must be called only once", stacklevel=2)

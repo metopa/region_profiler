@@ -18,14 +18,11 @@ def test_get_caller_info():
     """
     def tester():
         a_info = get_caller_info(1)
-        print(a_info)
         assert a_info.name == 'func_a'
         assert a_info.file == __file__
         assert a_info.line == 7
 
         b_info = get_caller_info(2)
-        print(b_info)
-
         assert b_info.name == 'func_b'
         assert b_info.file == __file__
         assert b_info.line == 13

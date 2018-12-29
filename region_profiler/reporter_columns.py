@@ -15,7 +15,7 @@ def as_column(name=None):
     """Mark a function as a column provider.
 
     Args:
-        name (:obj:`str`, optional): column name. If None, function name is used
+        name (:py:class:`str`, optional): column name. If None, function name is used
     """
     def decorate(func):
         setattr(func, 'column_name', name or func.__name__)
