@@ -11,14 +11,17 @@ Each column stores its name in ``column_name`` attribute.
 from region_profiler.utils import pretty_print_time
 
 
-def as_column(name=None):
+def as_column(print_name=None, name=None):
     """Mark a function as a column provider.
 
     Args:
+        print_name (:py:class:`str`, optional): column name without underscores.
+                                                If None, name with underscores replaced is used
         name (:py:class:`str`, optional): column name. If None, function name is used
     """
     def decorate(func):
         setattr(func, 'column_name', name or func.__name__)
+        setattr(func, 'column_print_name', print_name or func.column_name.replace('_', ' '))
         return func
     return decorate
 
@@ -28,22 +31,22 @@ def name(this_slice, all_slices):
     return this_slice.name
 
 
-@as_column('name')
+@as_column(name='name')
 def indented_name(this_slice, all_slices):
     return '. ' * this_slice.call_depth + this_slice.name
 
 
-@as_column('id')
+@as_column(name='id')
 def node_id(this_slice, all_slices):
     return str(this_slice.id)
 
 
-@as_column('parent_id')
+@as_column()
 def parent_id(this_slice, all_slices):
     return str(this_slice.parent.id) if this_slice.parent else ''
 
 
-@as_column('parent_name')
+@as_column()
 def parent_name(this_slice, all_slices):
     return this_slice.parent.name if this_slice.parent else ''
 

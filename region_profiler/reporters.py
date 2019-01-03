@@ -163,7 +163,7 @@ class ConsoleReporter:
         """
         slices = get_profiler_slice(rp)
 
-        rows = [[col.column_name for col in self.columns]]
+        rows = [[col.column_print_name for col in self.columns]]
         col_width = [len(n) for n in rows[0]]
 
         for s in slices:
