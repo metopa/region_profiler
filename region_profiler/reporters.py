@@ -121,6 +121,8 @@ def get_profiler_slice(rp):
 DEFAULT_CONSOLE_COLUMNS = (cols.indented_name, cols.total,
                            cols.percents_of_total, cols.count,
                            cols.min, cols.average, cols.max)
+"""Default column list for :py:class:`ConsoleReporter`.
+"""
 
 
 class ConsoleReporter:
@@ -132,6 +134,16 @@ class ConsoleReporter:
 
     Nodes are printed in a depth-first order with siblings processed
     sorted by the total time descending.
+
+    By default, these column are reported:
+
+    - name
+    - total time inside region
+    - percents of total application time
+    - number of timer region was hit
+    - min time inside region
+    - average time inside region
+    - max time inside region
 
     Example output::
 
@@ -182,6 +194,8 @@ class ConsoleReporter:
 DEFAULT_CSV_COLUMNS = (cols.node_id, cols.name, cols.parent_id, cols.parent_name,
                        cols.total_us, cols.total_inner_us,
                        cols.count, cols.min_us, cols.average_us, cols.max_us)
+"""Default column list for :py:class:`CsvReporter`.
+"""
 
 
 class CsvReporter:
@@ -193,6 +207,19 @@ class CsvReporter:
 
     Nodes are printed in a depth-first order with siblings processed
     sorted by the total time descending.
+
+    By default, these column are reported:
+
+    - id
+    - name
+    - parent node id
+    - parent node name
+    - total time inside region in us
+    - total time inside region in us excluding time inside its child regions
+    - number of timer region was hit
+    - min time inside region in us
+    - average time inside region in us
+    - max time inside region in us
 
     Example output::
 
@@ -207,6 +234,12 @@ class CsvReporter:
     """
 
     def __init__(self, columns=DEFAULT_CSV_COLUMNS, stream=sys.stderr):
+        """Initialize the reporter.
+
+        Args:
+            columns(list of report columns): list of columns that are used in the printout.
+            stream (file-like object): stream for output
+        """
         self.columns = columns
         self.stream = stream
 
@@ -226,3 +259,36 @@ class CsvReporter:
 
         for r in rows:
             print(', '.join(r), file=self.stream)
+
+
+class SilentReporter:
+    """Dummy test reporter. It stores rows in its attribute ``rows``.
+
+    Nodes are printed in a depth-first order with siblings processed
+    sorted by the total time descending.
+    """
+
+    def __init__(self, columns):
+        """Initialize the reporter.
+
+        Args:
+            columns(list of report columns): list of columns that are collected.
+        """
+        self.columns = columns
+        self.rows = None
+
+    def dump_profiler(self, rp):
+        """Dump the profiler state.
+
+        Args:
+            rp(:py:class:`region_profiler.profiler.RegionProfiler`): region profiler
+        """
+        slices = get_profiler_slice(rp)
+
+        rows = [[col.column_name for col in self.columns]]
+
+        for s in slices:
+            row = [col(s, slices) for col in self.columns]
+            rows.append(row)
+
+        self.rows = rows
