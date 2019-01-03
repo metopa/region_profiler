@@ -173,10 +173,21 @@ def func(name=None):
     Returns:
 
     """
-    if _profiler is not None:
-        return _profiler.func(name)
-    else:
-        return null_decorator()
+
+    def decorator(fn):
+        nonlocal name
+        if name is None:
+            name = fn.__name__
+
+        name += '()'
+
+        def wrapped(*args, **kwargs):
+            with region(name):
+                return fn(*args, **kwargs)
+
+        return wrapped
+
+    return decorator
 
 
 def iter_proxy(iterable, name=None):
