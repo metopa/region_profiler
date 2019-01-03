@@ -56,9 +56,9 @@ class RegionProfiler:
         if name is None:
             name = get_name_by_callsite(indirect_call_depth + 2)
         self.node_stack.append(self.current_node.get_child(name))
-        self.current_node.enter_region()
+        self.enter_current_region()
         yield self.current_node
-        self.current_node.exit_region()
+        self.exit_current_region()
         self.node_stack.pop()
 
     def func(self, name=None):
@@ -105,17 +105,29 @@ class RegionProfiler:
 
         while True:
             self.node_stack.append(node)
-            node.enter_region()
+            self.enter_current_region()
             try:
                 x = next(it)
             except StopIteration as e:
-                node.cancel_region()
+                self.cancel_current_region()
                 return
             finally:
-                node.exit_region()
+                self.exit_current_region()
                 self.node_stack.pop()
 
             yield x
+
+    def finalize(self):
+        self.root.exit_region()
+
+    def enter_current_region(self):
+        self.current_node.enter_region()
+
+    def exit_current_region(self):
+        self.current_node.exit_region()
+
+    def cancel_current_region(self):
+        self.current_node.cancel_region()
 
     @property
     def current_node(self):
@@ -144,7 +156,7 @@ def install(reporter=ConsoleReporter(), timer_cls=Timer):
         _profiler = RegionProfiler(timer_cls=timer_cls)
         _profiler.root.enter_region()
         atexit.register(lambda: reporter.dump_profiler(_profiler))
-        atexit.register(lambda: _profiler.root.exit_region())
+        atexit.register(lambda: _profiler.finalize())
     else:
         warnings.warn("region_profiler.install() must be called only once", stacklevel=2)
 
