@@ -31,7 +31,7 @@ class RegionProfiler:
     """
 
     def __init__(self, timer_cls=Timer):
-        """Construct new :any:`RegionProfiler`.
+        """Construct new :py:class:`RegionProfiler`.
 
         Args:
             timer_cls (:obj:`class`, optional): class, used for creating timers.
@@ -99,20 +99,21 @@ class RegionProfiler:
         if name is None:
             name = get_name_by_callsite(indirect_call_depth + 2)
 
-        self.node_stack.append(self.current_node.get_child(name))
-        try:
-            while True:
-                self.current_node.enter_region()
-                try:
-                    x = next(it)
-                except StopIteration as e:
-                    self.current_node.cancel_region()
-                    return
-                self.current_node.exit_region()
-                yield x
-        finally:
-            self.current_node.exit_region()
-            self.node_stack.pop()
+        node = self.current_node.get_child(name)
+
+        while True:
+            self.node_stack.append(node)
+            node.enter_region()
+            try:
+                x = next(it)
+            except StopIteration as e:
+                node.cancel_region()
+                return
+            finally:
+                node.exit_region()
+                self.node_stack.pop()
+                
+            yield x
 
     @property
     def current_node(self):
