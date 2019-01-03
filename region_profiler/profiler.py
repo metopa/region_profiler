@@ -128,7 +128,7 @@ class RegionProfiler:
 _profiler = None
 
 
-def install(reporter=ConsoleReporter()):
+def install(reporter=ConsoleReporter(), timer_cls=Timer):
     """
 
     Args:
@@ -139,7 +139,7 @@ def install(reporter=ConsoleReporter()):
     """
     global _profiler
     if _profiler is None:
-        _profiler = RegionProfiler()
+        _profiler = RegionProfiler(timer_cls=timer_cls)
         _profiler.root.enter_region()
         atexit.register(lambda: reporter.dump_profiler(_profiler))
         atexit.register(lambda: _profiler.root.exit_region())
