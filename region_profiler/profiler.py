@@ -30,6 +30,8 @@ class RegionProfiler:
         Code examples
     """
 
+    ROOT_NODE_NAME = '<main>'
+
     def __init__(self, timer_cls=Timer):
         """Construct new :py:class:`RegionProfiler`.
 
@@ -37,7 +39,7 @@ class RegionProfiler:
             timer_cls (:obj:`class`, optional): class, used for creating timers.
                 Default: ``region_profiler.utils.Timer``
         """
-        self.root = RootNode(timer_cls=timer_cls)
+        self.root = RootNode(name=self.ROOT_NODE_NAME, timer_cls=timer_cls)
         self.node_stack = [self.root]
 
     @contextmanager
@@ -112,7 +114,7 @@ class RegionProfiler:
             finally:
                 node.exit_region()
                 self.node_stack.pop()
-                
+
             yield x
 
     @property
