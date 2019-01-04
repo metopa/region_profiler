@@ -28,17 +28,18 @@ class RegionNode:
                 Default: ``region_profiler.utils.Timer``
         """
         self.name = name
-        self.timer = None
-        self.stats = SeqStats()
         self.timer_cls = timer_cls
+        self.timer = self.timer_cls()
+        self.entered = False
+        self.stats = SeqStats()
         self.children = dict()
 
     def enter_region(self):
         """Start timing current region.
         """
-        if self.timer is None:
+        if not self.entered:
+            self.entered = True
             self.timer = self.timer_cls()
-
         self.timer.start()
 
     def cancel_region(self):
@@ -46,15 +47,15 @@ class RegionNode:
 
         Stats will not be updated with the current measurement.
         """
-        self.timer = None
+        self.entered = False
 
     def exit_region(self):
         """Stop current timing and update stats with the current measurement.
         """
-        if self.timer is not None:
-            self.timer.stop()
+        self.timer.stop()
+        if self.entered:
             self.stats.add(self.timer.total_elapsed())
-            self.timer = None
+            self.entered = False
 
     def get_child(self, name, timer_cls=None):
         """Get node child with the given name.

@@ -51,7 +51,7 @@ class Slice:
         self.count = count
         self.total_time = total_time
         self.total_inner_time = total_inner_time
-        self.avg_time = total_time / count
+        self.avg_time = total_time / count if count else 0
         self.min_time = min_time
         self.max_time = max_time
 

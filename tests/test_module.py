@@ -54,7 +54,7 @@ def test_with_fake_timer(monkeypatch):
                     pass
 
     with fresh_region_profiler(monkeypatch):
-        install_profiler(reporter, lambda: Timer(mock_clock))
+        install_profiler(reporter=reporter, timer_cls=lambda: Timer(mock_clock))
         foo()
         with region('x'):
             pass

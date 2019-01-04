@@ -83,16 +83,23 @@ class Timer:
                       Measurements have the same precision as the clock
         """
         self.clock = clock
-        self._begin = 0
+        self._begin_ts = 0
+        self._end_ts = 0
         self._running = False
         self._total = 0
+
+    def begin_ts(self):
+        return self._begin_ts
+
+    def end_ts(self):
+        return self._end_ts
 
     def start(self):
         """Start new timer measurement.
 
         Call this function again to continue measurements.
         """
-        self._begin = self.clock()
+        self._begin_ts = self.clock()
         self._running = True
 
     def stop(self):
@@ -101,7 +108,8 @@ class Timer:
         Returns:
             int or float: duration of the last measurement
         """
-        e = self.current_elapsed()
+        self._end_ts = self.clock()
+        e = (self._end_ts - self._begin_ts) if self.is_running() else 0
         self._total += e
         self._running = False
         return e
@@ -126,7 +134,7 @@ class Timer:
         Returns:
             int or float: duration after last call to :py:meth:`start` or zero
         """
-        return self.clock() - self._begin if self.is_running() else 0
+        return self.clock() - self._begin_ts if self.is_running() else 0
 
     def total_elapsed(self):
         """Return total duration across all timer legs.

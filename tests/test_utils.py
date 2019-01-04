@@ -1,7 +1,6 @@
 import pytest
 
-from region_profiler import NullContext, null_decorator
-from region_profiler.utils import pretty_print_time
+from region_profiler.utils import pretty_print_time, NullContext, null_decorator
 
 
 def test_pretty_print_time():

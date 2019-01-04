@@ -37,7 +37,7 @@ def test_iter_proxy_custom_generator(iter_cnt):
     n = rp.root.children['test_loop']
     assert list(n.children) == []
     assert n.stats.count == iter_cnt
-    assert n.timer is None  # check that timing is stopped
+    assert not n.entered  # check that timing is stopped
 
 
 @pytest.mark.parametrize("iter_cnt", [0, 1, 10])
@@ -57,4 +57,6 @@ def test_iter_proxy_custom_exception(iter_cnt):
     assert list(n.children) == []
     assert n.stats.count == iter_cnt + 1
     # iteration that throws custom exception is calculated
-    assert n.timer is None  # check that timing is stopped
+    assert not n.entered  # check that timing is stopped
+
+# TODO listener test
