@@ -39,8 +39,7 @@ class RegionNode:
         """
         if not self.entered:
             self.entered = True
-            self.timer = self.timer_cls()
-        self.timer.start()
+            self.timer.start()
 
     def cancel_region(self):
         """Cancel current region timing.
@@ -48,13 +47,14 @@ class RegionNode:
         Stats will not be updated with the current measurement.
         """
         self.entered = False
+        self.timer.stop()
 
     def exit_region(self):
         """Stop current timing and update stats with the current measurement.
         """
         self.timer.stop()
         if self.entered:
-            self.stats.add(self.timer.total_elapsed())
+            self.stats.add(self.timer.elapsed())
             self.entered = False
 
     def get_child(self, name, timer_cls=None):
@@ -102,7 +102,7 @@ class _RootNodeStats:
 
     @property
     def total(self):
-        return self.timer.total_elapsed()
+        return self.timer.current_elapsed()
 
     @property
     def min(self):

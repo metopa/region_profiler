@@ -86,12 +86,21 @@ class Timer:
         self._begin_ts = 0
         self._end_ts = 0
         self._running = False
-        self._total = 0
 
     def begin_ts(self):
+        """Start event timestamp.
+
+        Returns:
+            int or float: timestamp
+        """
         return self._begin_ts
 
     def end_ts(self):
+        """Stop event timestamp.
+
+        Returns:
+            int or float: timestamp
+        """
         return self._end_ts
 
     def start(self):
@@ -108,11 +117,9 @@ class Timer:
         Returns:
             int or float: duration of the last measurement
         """
-        self._end_ts = self.clock()
-        e = (self._end_ts - self._begin_ts) if self.is_running() else 0
-        self._total += e
-        self._running = False
-        return e
+        if self._running:
+            self._end_ts = self.clock()
+            self._running = False
 
     def is_running(self):
         """Check if timer is currently running.
@@ -122,31 +129,26 @@ class Timer:
         """
         return self._running
 
+    def elapsed(self):
+        """Return duration between `start` and `stop` events.
+
+        If timer is running (no :py:meth:`stop` has been called
+        after last :py:meth:`start` invocation), 0 is returned.
+
+        Returns:
+            int or float: duration
+        """
+        return (self._end_ts - self._begin_ts) if not self._running else 0
+
     def current_elapsed(self):
-        """Return duration of the current timer leg.
-
-        If timer is running (no :py:meth:`stop` has been called
-        after last :py:meth:`start` invocation),
-        duration elapsed from last :py:meth:`start` call is returned.
-
-        Otherwise, zero is returned.
+        """Return duration between `start` and `stop` events or
+        duration from last `start` event if no pairing `stop` event occurred.
 
         Returns:
-            int or float: duration after last call to :py:meth:`start` or zero
+            int or float: duration
         """
-        return self.clock() - self._begin_ts if self.is_running() else 0
-
-    def total_elapsed(self):
-        """Return total duration across all timer legs.
-
-        If timer is running (no :py:meth:`stop` has been called
-        after last :py:meth:`start` invocation),
-        duration of the current leg is also added to the total.
-
-        Returns:
-            int or float: sum of the measured legs
-        """
-        return self._total + self.current_elapsed()
+        return (self._end_ts - self._begin_ts) if not self._running \
+            else (self.clock() - self._begin_ts)
 
 
 CallerInfo = namedtuple('CallerInfo', ['file', 'line', 'name'])
@@ -198,6 +200,7 @@ def get_name_by_callsite(stack_depth=1):
 class NullContext:
     """Empty context manager.
     """
+
     def __enter__(self):
         pass
 

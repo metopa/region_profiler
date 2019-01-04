@@ -61,9 +61,9 @@ def test_with_fake_timer(monkeypatch):
         foo()
 
     expected = [['name', 'total_us', 'total_inner_us', 'count'],
-                [RegionProfiler.ROOT_NODE_NAME, '49000000', '4000000', '1'],
-                ['foo()', '44000000', '4000000', '2'],
-                ['a', '40000000', '22000000', '2'],
+                [RegionProfiler.ROOT_NODE_NAME, '51000000', '4000000', '1'],
+                ['foo()', '46000000', '4000000', '2'],
+                ['a', '42000000', '24000000', '2'],
                 ['b', '12000000', '12000000', '12'],
                 ['iter', '6000000', '6000000', '6'],
                 ['x', '1000000', '1000000', '1']]
@@ -118,5 +118,3 @@ def test_with_real_timer(monkeypatch):
         else:
             assert e[1] * lower <= int(r[1]) <= e[1] * upper + upper_delta
             assert e[2] * lower <= int(r[2]) <= e[2] * upper + upper_delta
-
-

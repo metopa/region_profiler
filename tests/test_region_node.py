@@ -101,7 +101,7 @@ def test_cancellation():
     """Test timing cancellation event.
     """
     mock_clock = mock.Mock()
-    mock_clock.side_effect = [5, 10, 20, 21]
+    mock_clock.side_effect = [5, 7, 10, 20, 21, 22]
     t_cls = lambda: Timer(clock=mock_clock)
 
     n = RegionNode('x', timer_cls=t_cls)
@@ -139,24 +139,3 @@ def test_root_cancellation():
 
         n = RootNode(timer_cls=t_cls)
         n.cancel_region()
-
-
-def test_root_restart():
-    """Test that RootNode continues previous timing on restart.
-    """
-    mock_clock = mock.Mock()
-    mock_clock.side_effect = [5, 11, 20, 23, 23, 23]
-    t_cls = lambda: Timer(clock=mock_clock)
-
-    n = RootNode(timer_cls=t_cls)
-    n.exit_region()
-    assert n.stats.count == 1
-    assert n.stats.total == 6
-    assert n.stats.min == 6
-    assert n.stats.max == 6
-    n.enter_region()
-    assert n.stats.count == 1
-    assert n.stats.total == 9
-    assert n.stats.min == 9
-    assert n.stats.max == 9
-
