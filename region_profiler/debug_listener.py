@@ -1,16 +1,25 @@
+import sys
+
 from region_profiler.listener import RegionProfilerListener
+from region_profiler.utils import pretty_print_time
 
 
 class DebugListener(RegionProfilerListener):
     def finalize(self):
-        print('Finalizing profiler')
+        print('RegionProfiler: Finalizing profiler', file=sys.stderr)
 
     def region_entered(self, profiler, region):
-        print('Entered {} at {}'.format(region.name, region.timer.begin_ts()))
+        ts = region.timer.begin_ts() - profiler.root.timer.begin_ts()
+        print('RegionProfiler: Entered {} at {}'.
+              format(region.name, pretty_print_time(ts)), file=sys.stderr)
 
     def region_exited(self, profiler, region):
-        print('Exited {} at {} after {}'.
-              format(region.name, region.timer.begin_ts(), region.timer.elapsed()))
+        ts = region.timer.end_ts() - profiler.root.timer.begin_ts()
+        print('RegionProfiler: Exited {} at {} after {}'.
+              format(region.name, pretty_print_time(ts),
+                     pretty_print_time(region.timer.elapsed())),
+              file=sys.stderr)
 
     def region_canceled(self, profiler, region):
-        pass
+        ts = region.timer.end_ts() - profiler.root.timer.begin_ts()
+        print('RegionProfiler: Canceled {} at {}'.format(region.name, pretty_print_time(ts)), file=sys.stderr)
