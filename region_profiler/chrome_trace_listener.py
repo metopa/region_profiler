@@ -9,10 +9,14 @@ class ChromeTraceListener(RegionProfilerListener):
     def __init__(self, trace_filename):
         self.trace_filename = trace_filename
         self.f = open(trace_filename, 'w')
-        self.need_comma = False
         self.pending_begin_node = None
         self.last_canceled_node = None
-        self.f.write('[')
+        self.f.write('[{{"name": "process_name", "ph": "M", "pid": {}, "tid": {},'
+                     '"args": {{"name" : "{}"}}}}'.
+                     format(os.getpid(), threading.get_ident(), os.path.basename(sys.argv[0])))
+        self.f.write(',\n{{"name": "thread_name", "ph": "M", "pid": {}, "tid": {},'
+                     '"args": {{"name" : "Main"}}}}'.
+                     format(os.getpid(), threading.get_ident()))
 
     def finalize(self):
         self.f.write(']')
@@ -50,9 +54,5 @@ class ChromeTraceListener(RegionProfilerListener):
         self.write_event(region.name, int(region.timer.end_ts() * 1000000), 'E')
 
     def write_event(self, name, ts, event_type):
-        if self.need_comma:
-            self.f.write(',')
-        else:
-            self.need_comma = True
-        self.f.write('{{"name": "{}", "ph": "{}", "ts": {}, "pid": {}, "tid": {}}}'.
+        self.f.write(',\n{{"name": "{}", "ph": "{}", "ts": {}, "pid": {}, "tid": {}}}'.
                      format(name, event_type, ts, os.getpid(), threading.get_ident()))

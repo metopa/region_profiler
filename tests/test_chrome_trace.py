@@ -42,7 +42,7 @@ def test_chrome_trace(tmpdir, capsys):
     assert os.path.isfile(str(trace_file))
     with trace_file.open() as f:
         trace = json.load(f)
-    assert trace == expected
+    assert trace[2:] == expected
 
 
 def test_chrome_trace_node_canceled(tmpdir, capsys):
@@ -83,7 +83,7 @@ def test_chrome_trace_node_canceled(tmpdir, capsys):
     assert os.path.isfile(str(trace_file))
     with trace_file.open() as f:
         trace = json.load(f)
-    assert trace == expected
+    assert trace[2:] == expected
 
 
 def test_chrome_trace_parent_node_canceled(tmpdir, capsys):
@@ -140,4 +140,4 @@ def test_chrome_trace_parent_node_canceled(tmpdir, capsys):
     assert os.path.isfile(str(trace_file))
     with trace_file.open() as f:
         trace = json.load(f)
-    assert trace == expected
+    assert trace[2:] == expected
