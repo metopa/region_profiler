@@ -46,6 +46,8 @@ class RegionProfiler:
         self.root = RootNode(name=self.ROOT_NODE_NAME, timer_cls=timer_cls)
         self.node_stack = [self.root]
         self.listeners = listeners or []
+        for l in self.listeners:
+            l.region_entered(self, self.root)
 
     @contextmanager
     def region(self, name=None, indirect_call_depth=0):
