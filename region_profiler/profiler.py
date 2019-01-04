@@ -3,6 +3,7 @@ import warnings
 from contextlib import contextmanager
 
 from region_profiler.chrome_trace_listener import ChromeTraceListener
+from region_profiler.debug_listener import DebugListener
 from region_profiler.node import RootNode
 from region_profiler.reporters import ConsoleReporter
 from region_profiler.utils import (NullContext, Timer, get_name_by_callsite)
@@ -169,7 +170,8 @@ This singleton is initialized using :py:func:`install`.
 """
 
 
-def install(reporter=ConsoleReporter(), chrome_trace_file=None, timer_cls=Timer):
+def install(reporter=ConsoleReporter(), chrome_trace_file=None,
+            debug_mode=False, timer_cls=Timer):
     """
 
     Args:
@@ -182,6 +184,8 @@ def install(reporter=ConsoleReporter(), chrome_trace_file=None, timer_cls=Timer)
         listeners = []
         if chrome_trace_file:
             listeners.append(ChromeTraceListener(chrome_trace_file))
+        if debug_mode:
+            listeners.append(DebugListener())
         _profiler = RegionProfiler(listeners=listeners, timer_cls=timer_cls)
         _profiler.root.enter_region()
         atexit.register(lambda: reporter.dump_profiler(_profiler))
