@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytest
 
-from region_profiler import Timer
+from region_profiler.utils import Timer
 from region_profiler.node import RegionNode, RootNode
 from region_profiler.utils import SeqStats
 

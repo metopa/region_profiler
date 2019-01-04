@@ -5,10 +5,11 @@ from unittest import mock
 
 import pytest
 
-from region_profiler import region, func, install as install_profiler, iter_proxy, Timer, RegionProfiler
+from region_profiler import region, func, install as install_profiler, iter_proxy, RegionProfiler
 import region_profiler.profiler
 from region_profiler.reporters import SilentReporter
 from region_profiler import reporter_columns as cols
+from region_profiler.utils import Timer
 
 
 @contextlib.contextmanager
