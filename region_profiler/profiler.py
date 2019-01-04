@@ -2,10 +2,10 @@ import atexit
 import warnings
 from contextlib import contextmanager
 
+from region_profiler.chrome_trace_listener import ChromeTraceListener
 from region_profiler.node import RootNode
 from region_profiler.reporters import ConsoleReporter
-from region_profiler.utils import (NullContext, Timer, get_name_by_callsite,
-                                   null_decorator)
+from region_profiler.utils import (NullContext, Timer, get_name_by_callsite)
 
 
 class RegionProfiler:
@@ -32,33 +32,43 @@ class RegionProfiler:
 
     ROOT_NODE_NAME = '<main>'
 
-    def __init__(self, timer_cls=Timer):
+    def __init__(self, timer_cls=Timer, listeners=None):
         """Construct new :py:class:`RegionProfiler`.
 
         Args:
             timer_cls (:obj:`class`, optional): class, used for creating timers.
                 Default: ``region_profiler.utils.Timer``
+            listeners (:py:class:`list` of
+                :py:class:`region_profiler.listener.RegionProfilerListener`, optional):
+                optional list of listeners, that can augment region enter and exit events.
         """
         self.root = RootNode(name=self.ROOT_NODE_NAME, timer_cls=timer_cls)
         self.node_stack = [self.root]
+        self.listeners = listeners or []
 
     @contextmanager
     def region(self, name=None, indirect_call_depth=0):
         """Start new region in the current context.
 
+        This function implements context manager interface.
+        When used with ``with`` statement,
+        it enters a region with the specified name in the current context
+        on invocation and leaves it on ``with`` block exit.
+
         Args:
-            name:
-            indirect_call_depth:
+            name (:py:class:`str`, optional): region name.
+                If None, the name is deducted from region location in source
+            indirect_call_depth (:py:class:`int`, optional):
 
         Returns:
-
+            :py:class:`region_profiler.node.RegionNode`: node of the region.
         """
         if name is None:
             name = get_name_by_callsite(indirect_call_depth + 2)
         self.node_stack.append(self.current_node.get_child(name))
-        self.enter_current_region()
+        self._enter_current_region()
         yield self.current_node
-        self.exit_current_region()
+        self._exit_current_region()
         self.node_stack.pop()
 
     def func(self, name=None):
@@ -105,55 +115,74 @@ class RegionProfiler:
 
         while True:
             self.node_stack.append(node)
-            self.enter_current_region()
+            self._enter_current_region()
             try:
                 x = next(it)
             except StopIteration as e:
-                self.cancel_current_region()
+                self._cancel_current_region()
                 return
             finally:
-                self.exit_current_region()
+                self._exit_current_region()
                 self.node_stack.pop()
 
             yield x
 
     def finalize(self):
+        """Perform profiler finalization on application shutdown.
+        Finalize all associated listeners.
+        """
         self.root.exit_region()
+        for l in self.listeners:
+            l.region_exited(self, self.root)
+            l.finalize()
 
-    def enter_current_region(self):
+    def _enter_current_region(self):
         self.current_node.enter_region()
+        for l in self.listeners:
+            l.region_entered(self, self.current_node)
 
-    def exit_current_region(self):
+    def _exit_current_region(self):
         self.current_node.exit_region()
+        for l in self.listeners:
+            l.region_exited(self, self.current_node)
 
-    def cancel_current_region(self):
+    def _cancel_current_region(self):
         self.current_node.cancel_region()
+        for l in self.listeners:
+            l.region_canceled(self, self.current_node)
 
     @property
     def current_node(self):
-        """
+        """Return current region node.
 
         Returns:
-
+            :py:class:`region_profiler.node.RegionNode`:
+                node of the region as defined above.
         """
         return self.node_stack[-1]
 
 
 _profiler = None
+"""Global :py:class:`RegionProfiler` instance.
+
+This singleton is initialized using :py:func:`install`.
+"""
 
 
-def install(reporter=ConsoleReporter(), timer_cls=Timer):
+def install(reporter=ConsoleReporter(), chrome_trace_file=None, timer_cls=Timer):
     """
 
     Args:
         reporter:
-
-    Returns:
-
+        timer_cls:
+        chrome_trace_file:
     """
     global _profiler
     if _profiler is None:
-        _profiler = RegionProfiler(timer_cls=timer_cls)
+        listeners = []
+        if chrome_trace_file:
+            listeners.append(ChromeTraceListener(chrome_trace_file))
+        _profiler = RegionProfiler(listeners=listeners, timer_cls=timer_cls)
         _profiler.root.enter_region()
         atexit.register(lambda: reporter.dump_profiler(_profiler))
         atexit.register(lambda: _profiler.finalize())
