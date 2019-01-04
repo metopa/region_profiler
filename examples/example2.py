@@ -2,7 +2,7 @@ import time
 
 import numpy as np
 from region_profiler import region, func, iter_proxy, install
-install()
+install(chrome_trace_file='trace.json')
 
 
 def slow_iter(iterable):
