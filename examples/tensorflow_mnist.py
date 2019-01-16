@@ -11,8 +11,11 @@ Project: https://github.com/aymericdamien/TensorFlow-Examples/
 """
 from __future__ import print_function
 
+import region_profiler as rp
+
+rp.install()
+
 import tensorflow as tf
-# Import MNIST data
 from tensorflow.examples.tutorials.mnist import input_data
 
 tf.logging.set_verbosity(tf.logging.ERROR)
@@ -50,12 +53,18 @@ class NeuralNet(tfe.Network):
         self.out_layer = self.track_layer(tf.layers.Dense(num_classes))
 
     def call(self, x):
-        x = self.layer1(x)
-        x = self.layer2(x)
-        return self.out_layer(x)
+        with rp.region('NN'):
+            with rp.region('layer 1'):
+                x = self.layer1(x)
+            with rp.region('layer 2'):
+                x = self.layer2(x)
+            with rp.region('out layer'):
+                x = self.out_layer(x)
+            return x
 
 
 # Cross-Entropy loss function
+@rp.func()
 def loss_fn(inference_fn, inputs, labels):
     # Using sparse_softmax cross entropy
     return tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
@@ -63,14 +72,17 @@ def loss_fn(inference_fn, inputs, labels):
 
 
 # Calculate accuracy
+@rp.func()
 def accuracy_fn(inference_fn, inputs, labels):
     prediction = tf.nn.softmax(inference_fn(inputs))
     correct_pred = tf.equal(tf.argmax(prediction, 1), labels)
     return tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 
 
+@rp.func()
 def fetch_mnist():
     return input_data.read_data_sets("/tmp/data/", one_hot=False)
+
 
 def main():
     mnist = fetch_mnist()
@@ -91,45 +103,48 @@ def main():
     # Training
     average_loss = 0.
     average_acc = 0.
-    for step in range(num_steps):
-        # Iterate through the dataset
-        d = dataset_iter.next()
+    with rp.region('train'):
+        for step in range(num_steps):
+            # Iterate through the dataset
+            with rp.region('fetch_next'):
+                d = dataset_iter.next()
+                # Images
+                x_batch = d[0]
+                # Labels
+                y_batch = tf.cast(d[1], dtype=tf.int64)
 
-        # Images
-        x_batch = d[0]
-        # Labels
-        y_batch = tf.cast(d[1], dtype=tf.int64)
+            with rp.region('forward'):
+                # Compute the batch loss
+                batch_loss = loss_fn(neural_net, x_batch, y_batch)
+                average_loss += batch_loss
+                # Compute the batch accuracy
+                batch_accuracy = accuracy_fn(neural_net, x_batch, y_batch)
+                average_acc += batch_accuracy
 
-        # Compute the batch loss
-        batch_loss = loss_fn(neural_net, x_batch, y_batch)
-        average_loss += batch_loss
-        # Compute the batch accuracy
-        batch_accuracy = accuracy_fn(neural_net, x_batch, y_batch)
-        average_acc += batch_accuracy
+            if step == 0:
+                # Display the initial cost, before optimizing
+                print("Initial loss= {:.9f}".format(average_loss))
 
-        if step == 0:
-            # Display the initial cost, before optimizing
-            print("Initial loss= {:.9f}".format(average_loss))
+            with rp.region('backward'):
+                # Update the variables following gradients info
+                optimizer.apply_gradients(grad(neural_net, x_batch, y_batch))
 
-        # Update the variables following gradients info
-        optimizer.apply_gradients(grad(neural_net, x_batch, y_batch))
-
-        # Display info
-        if (step + 1) % display_step == 0 or step == 0:
-            if step > 0:
-                average_loss /= display_step
-                average_acc /= display_step
-            print("Step:", '%04d' % (step + 1), " loss=",
-                  "{:.9f}".format(average_loss), " accuracy=",
-                  "{:.4f}".format(average_acc))
-            average_loss = 0.
-            average_acc = 0.
+            # Display info
+            if (step + 1) % display_step == 0 or step == 0:
+                if step > 0:
+                    average_loss /= display_step
+                    average_acc /= display_step
+                print("Step:", '%04d' % (step + 1), " loss=",
+                      "{:.9f}".format(average_loss), " accuracy=",
+                      "{:.4f}".format(average_acc))
+                average_loss = 0.
+                average_acc = 0.
 
     # Evaluate model on the test image set
     testX = mnist.test.images
     testY = mnist.test.labels
-
-    test_acc = accuracy_fn(neural_net, testX, testY)
+    with rp.region('test'):
+        test_acc = accuracy_fn(neural_net, testX, testY)
     print("Testset Accuracy: {:.4f}".format(test_acc))
 
 
