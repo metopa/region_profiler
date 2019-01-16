@@ -53,7 +53,7 @@ class NeuralNet(tfe.Network):
         self.out_layer = self.track_layer(tf.layers.Dense(num_classes))
 
     def call(self, x):
-        with rp.region('NN'):
+        with rp.region('NN', asglobal=True):
             with rp.region('layer 1'):
                 x = self.layer1(x)
             with rp.region('layer 2'):

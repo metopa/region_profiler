@@ -50,7 +50,7 @@ class RegionProfiler:
             l.region_entered(self, self.root)
 
     @contextmanager
-    def region(self, name=None, indirect_call_depth=0):
+    def region(self, name=None, asglobal=False, indirect_call_depth=0):
         """Start new region in the current context.
 
         This function implements context manager interface.
@@ -61,24 +61,31 @@ class RegionProfiler:
         Args:
             name (:py:class:`str`, optional): region name.
                 If None, the name is deducted from region location in source
-            indirect_call_depth (:py:class:`int`, optional):
+            asglobal (bool): enter the region from root context, no current one.
+                May be used to merge stats from different call paths
+            indirect_call_depth (:py:class:`int`, optional): adjust call depth
+                to correctly identify the callsite position for automatic naming
 
         Returns:
             :py:class:`region_profiler.node.RegionNode`: node of the region.
         """
         if name is None:
             name = get_name_by_callsite(indirect_call_depth + 2)
-        self.node_stack.append(self.current_node.get_child(name))
+        parent = self.root if asglobal else self.current_node
+        self.node_stack.append(parent.get_child(name))
         self._enter_current_region()
         yield self.current_node
         self._exit_current_region()
         self.node_stack.pop()
 
-    def func(self, name=None):
+    def func(self, name=None, asglobal=False):
         """
 
         Args:
-            name:
+            name (:py:class:`str`, optional): region name.
+                If None, the name is deducted from region location in source
+            asglobal (bool): enter the region from root context, no current one.
+                May be used to merge stats from different call paths
 
         Returns:
 
@@ -92,19 +99,20 @@ class RegionProfiler:
             name += '()'
 
             def wrapped(*args, **kwargs):
-                with self.region(name):
+                with self.region(name, asglobal):
                     return fn(*args, **kwargs)
 
             return wrapped
 
         return decorator
 
-    def iter_proxy(self, iterable, name=None, indirect_call_depth=0):
+    def iter_proxy(self, iterable, name=None, asglobal=False, indirect_call_depth=0):
         """
 
         Args:
             iterable:
             name:
+            asglobal:
             indirect_call_depth:
 
         Returns:
@@ -113,8 +121,8 @@ class RegionProfiler:
         it = iter(iterable)
         if name is None:
             name = get_name_by_callsite(indirect_call_depth + 2)
-
-        node = self.current_node.get_child(name)
+        parent = self.root if asglobal else self.current_node
+        node = parent.get_child(name)
 
         while True:
             self.node_stack.append(node)
@@ -175,7 +183,6 @@ This singleton is initialized using :py:func:`install`.
 def install(reporter=ConsoleReporter(), chrome_trace_file=None,
             debug_mode=False, timer_cls=Timer):
     """
-
     Args:
         reporter:
         timer_cls:
@@ -196,26 +203,28 @@ def install(reporter=ConsoleReporter(), chrome_trace_file=None,
         warnings.warn("region_profiler.install() must be called only once", stacklevel=2)
 
 
-def region(name=None):
+def region(name=None, asglobal=False):
     """
 
     Args:
         name:
+        asglobal:
 
     Returns:
 
     """
     if _profiler is not None:
-        return _profiler.region(name, 0)
+        return _profiler.region(name, asglobal, 0)
     else:
         return NullContext()
 
 
-def func(name=None):
+def func(name=None, asglobal=False):
     """
 
     Args:
         name:
+        asglobal:
 
     Returns:
 
@@ -229,7 +238,7 @@ def func(name=None):
         name += '()'
 
         def wrapped(*args, **kwargs):
-            with region(name):
+            with region(name, asglobal=asglobal):
                 return fn(*args, **kwargs)
 
         return wrapped
@@ -237,17 +246,18 @@ def func(name=None):
     return decorator
 
 
-def iter_proxy(iterable, name=None):
+def iter_proxy(iterable, name=None, asglobal=False):
     """
 
     Args:
         iterable:
+        asglobal:
         name:
 
     Returns:
 
     """
     if _profiler is not None:
-        return _profiler.iter_proxy(iterable, name, -1)
+        return _profiler.iter_proxy(iterable, name, asglobal, -1)
     else:
         return iterable

@@ -72,6 +72,52 @@ def test_with_fake_timer(monkeypatch):
     assert reporter.rows == expected
 
 
+def test_with_global_regions(monkeypatch):
+    """Integration test with regions marked as globals.
+    """
+    reporter = SilentReporter([cols.name, cols.total_us, cols.total_inner_us, cols.count])
+    mock_clock = mock.Mock()
+    mock_clock.side_effect = list(range(0, 100, 1))
+
+    @func(asglobal=True)
+    def bar():
+        with region('a'):
+            with region('bar_global', asglobal=True):
+                for i in iter_proxy([1, 2, 3], 'iter', asglobal=True):
+                    pass
+
+    @func()
+    def foo():
+        with region('a'):
+            for i in iter_proxy([1, 2, 3], 'iter'):
+                with region('b'):
+                    pass
+                with region('b'):
+                    pass
+            bar()
+
+    with fresh_region_profiler(monkeypatch):
+        install_profiler(reporter=reporter, timer_cls=lambda: Timer(mock_clock))
+        foo()
+        with region('x'):
+            pass
+        foo()
+        
+    expected = [['name', 'total_us', 'total_inner_us', 'count'],
+                [RegionProfiler.ROOT_NODE_NAME, '79000000', '0', '1'],
+                ['foo()', '74000000', '4000000', '2'],
+                ['a', '70000000', '52000000', '2'],
+                ['b', '12000000', '12000000', '12'],
+                ['iter', '6000000', '6000000', '6'],
+                ['bar()', '26000000', '4000000', '2'],
+                ['a', '22000000', '22000000', '2'],
+                ['bar_global', '18000000', '18000000', '2'],
+                ['iter', '6000000', '6000000', '6'],
+                ['x', '1000000', '1000000', '1']]
+
+    assert reporter.rows == expected
+
+
 def test_with_real_timer(monkeypatch):
     """Integration test with a real timer.
     """

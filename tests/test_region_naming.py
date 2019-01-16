@@ -91,3 +91,29 @@ def test_func_automatic_naming():
     assert set(ch['foo()'].children.keys()) == {'inner'}
     assert set(ch['baz()'].children.keys()) == {'foo()'}
     assert set(ch['baz()'].children['foo()'].children.keys()) == {'inner'}
+
+
+def test_global_regions():
+    """Test that regions marked as global has root as a parent.
+    """
+    rp = RegionProfiler()
+
+    @rp.func('foo', asglobal=True)
+    def foo():
+        with rp.region('inner', asglobal=True):
+            return sum(rp.iter_proxy([1, 2, 3], name='sum', asglobal=True))
+
+    @rp.func('baz')
+    def bar():
+        with rp.region('plus'):
+            return foo() + foo()
+
+    x = bar() + foo()
+    ch = rp.root.children
+    assert set(ch.keys()) == {'foo()', 'baz()', 'inner', 'sum'}
+    assert len(ch['foo()'].children.keys()) == 0
+    assert set(ch['baz()'].children.keys()) == {'plus'}
+    assert len(ch['baz()'].children['plus'].children.keys()) == 0
+    assert len(ch['foo()'].children.keys()) == 0
+    assert len(ch['inner'].children.keys()) == 0
+    assert len(ch['sum'].children.keys()) == 0
