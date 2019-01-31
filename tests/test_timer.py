@@ -33,7 +33,7 @@ def test_timer_multiple_shots():
     its attributes after a multiple timer shots.
     """
     mock_clock = mock.Mock()
-    mock_clock.side_effect = [10, 20, 30, 40, 100, 120, 200]
+    mock_clock.side_effect = [10, 20, 30, 40, 100, 110, 120, 200]
     total = 0
 
     t = Timer(clock=mock_clock)

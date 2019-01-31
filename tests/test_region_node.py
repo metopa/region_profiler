@@ -55,8 +55,6 @@ def test_timing():
     assert n.stats == SeqStats()
     n.exit_region()
     assert n.stats == SeqStats(count=1, total=10, min=10, max=10)
-    n.exit_region()
-    assert n.stats == SeqStats(count=1, total=10, min=10, max=10)
 
 
 def test_multiple_timing():

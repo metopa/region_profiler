@@ -86,6 +86,7 @@ class Timer:
         self._begin_ts = 0
         self._end_ts = 0
         self._running = False
+        self.last_event_time = 0
 
     def begin_ts(self):
         """Start event timestamp.
@@ -109,6 +110,7 @@ class Timer:
         Call this function again to continue measurements.
         """
         self._begin_ts = self.clock()
+        self.last_event_time = self._begin_ts
         self._running = True
 
     def stop(self):
@@ -117,9 +119,15 @@ class Timer:
         Returns:
             int or float: duration of the last measurement
         """
+        self.last_event_time = self.clock()
         if self._running:
-            self._end_ts = self.clock()
+            self._end_ts = self.last_event_time
             self._running = False
+
+    def mark_aux_event(self):
+        """Update ``last_event_time``.
+        """
+        self.last_event_time = self.clock()
 
     def is_running(self):
         """Check if timer is currently running.

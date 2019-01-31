@@ -129,7 +129,7 @@ class RegionProfiler:
             self._enter_current_region()
             try:
                 x = next(it)
-            except StopIteration as e:
+            except StopIteration:
                 self._cancel_current_region()
                 return
             finally:

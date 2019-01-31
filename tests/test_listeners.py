@@ -29,8 +29,8 @@ def test_debug_listener(capsys):
     assert 'Exited iter at 4' in err
     assert 'Entered iter at 5' in err
     assert 'Canceled iter at 6' in err
-    assert 'Exited iter at 6' in err
-    assert 'Exited a at 7' in err
-    assert 'Exited foo() at 8' in err
+    assert 'Exited iter at 7' in err
+    assert 'Exited a at 8' in err
+    assert 'Exited foo() at 9' in err
     assert 'Finalizing' in err
 

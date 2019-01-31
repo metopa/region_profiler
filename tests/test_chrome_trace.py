@@ -76,8 +76,8 @@ def test_chrome_trace_node_canceled(tmpdir, capsys):
         {'name': 'b', 'ph': 'E', 'ts': 7000000, 'pid': pid, 'tid': tid},
         {'name': 'c', 'ph': 'B', 'ts': 8000000, 'pid': pid, 'tid': tid},
         {'name': 'c', 'ph': 'E', 'ts': 9000000, 'pid': pid, 'tid': tid},
-        {'name': 'a', 'ph': 'E', 'ts': 12000000, 'pid': pid, 'tid': tid},
-        {'name': rp.ROOT_NODE_NAME, 'ph': 'E', 'ts': 13000000, 'pid': pid, 'tid': tid},
+        {'name': 'a', 'ph': 'E', 'ts': 13000000, 'pid': pid, 'tid': tid},
+        {'name': rp.ROOT_NODE_NAME, 'ph': 'E', 'ts': 14000000, 'pid': pid, 'tid': tid},
     ]
 
     assert os.path.isfile(str(trace_file))
@@ -133,8 +133,8 @@ def test_chrome_trace_parent_node_canceled(tmpdir, capsys):
         {'name': 'exit', 'ph': 'B', 'ts': 15000000, 'pid': pid, 'tid': tid},
         {'name': 'exit', 'ph': 'E', 'ts': 16000000, 'pid': pid, 'tid': tid},
         {'name': 'b', 'ph': 'E', 'ts': 17000000, 'pid': pid, 'tid': tid},
-        {'name': 'a', 'ph': 'E', 'ts': 18000000, 'pid': pid, 'tid': tid},
-        {'name': rp.ROOT_NODE_NAME, 'ph': 'E', 'ts': 19000000, 'pid': pid, 'tid': tid},
+        {'name': 'a', 'ph': 'E', 'ts': 19000000, 'pid': pid, 'tid': tid},
+        {'name': rp.ROOT_NODE_NAME, 'ph': 'E', 'ts': 20000000, 'pid': pid, 'tid': tid},
     ]
 
     assert os.path.isfile(str(trace_file))

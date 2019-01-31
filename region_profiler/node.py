@@ -19,6 +19,7 @@ class RegionNode:
         name (str): Node name.
         stats (SeqStats): Measurement statistics.
     """
+
     def __init__(self, name, timer_cls=Timer):
         """Create new instance of ``RegionNode`` with the given name.
 
@@ -30,32 +31,48 @@ class RegionNode:
         self.name = name
         self.timer_cls = timer_cls
         self.timer = self.timer_cls()
-        self.entered = False
+        self.cancelled = False
         self.stats = SeqStats()
         self.children = dict()
+        self.recursion_depth = 0
+        self.last_event_time = 0
 
     def enter_region(self):
         """Start timing current region.
         """
-        if not self.entered:
-            self.entered = True
+        if self.recursion_depth == 0:
             self.timer.start()
+        else:
+            self.timer.mark_aux_event()
+
+        self.cancelled = False
+        self.recursion_depth += 1
 
     def cancel_region(self):
         """Cancel current region timing.
 
         Stats will not be updated with the current measurement.
         """
-        self.entered = False
-        self.timer.stop()
+        self.cancelled = True
+        self.recursion_depth -= 1
+        if self.recursion_depth == 0:
+            self.timer.stop()
+        else:
+            self.timer.mark_aux_event()
 
     def exit_region(self):
         """Stop current timing and update stats with the current measurement.
         """
-        self.timer.stop()
-        if self.entered:
-            self.stats.add(self.timer.elapsed())
-            self.entered = False
+        if self.cancelled:
+            self.cancelled = False
+            self.timer.mark_aux_event()
+        else:
+            self.recursion_depth -= 1
+            if self.recursion_depth == 0:
+                self.timer.stop()
+                self.stats.add(self.timer.elapsed())
+            else:
+                self.timer.mark_aux_event()
 
     def get_child(self, name, timer_cls=None):
         """Get node child with the given name.
@@ -77,11 +94,16 @@ class RegionNode:
             self.children[name] = c
             return c
 
+    def timer_is_active(self):
+        """Return True if timer is currently running.
+        """
+        return self.recursion_depth > 1 or self.recursion_depth == 1 and self.cancelled
+
     def __str__(self):
         return self.name or '???'
 
     def __repr__(self):
-        return 'RegionNode(name="{}", stats={}, timer_cls={})'.\
+        return 'RegionNode(name="{}", stats={}, timer_cls={})'. \
             format(str(self), repr(self.stats), self.timer_cls)
 
 
@@ -93,6 +115,7 @@ class _RootNodeStats:
     :py:class:`region_profiler.utils.Timer` object.
     Proxy properties return current timer values.
     """
+
     def __init__(self, timer):
         self.timer = timer
 
@@ -122,6 +145,7 @@ class RootNode(RegionNode):
     returning the current measurement values instead of
     the real stats of previous measurements.
     """
+
     def __init__(self, name='<root>', timer_cls=Timer):
         super(RootNode, self).__init__(name, timer_cls)
         self.enter_region()
