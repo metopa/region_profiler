@@ -1,9 +1,14 @@
+# cython: language_level=3
+# distutils: language=c++
+
 import warnings
 
-from region_profiler.utils import SeqStats, Timer
+from region_profiler.cython.utils cimport SeqStats, Timer
+from region_profiler.cython.node cimport RegionNode, RootNode, _RootNodeStats
 
+from libcpp cimport bool
 
-class RegionNode:
+cdef class RegionNode:
     """RegionNode represents a single entry in a region tree.
 
     It contains a builtin timer for measuring the time, spent
@@ -20,7 +25,7 @@ class RegionNode:
         stats (SeqStats): Measurement statistics.
     """
 
-    def __init__(self, name, timer_cls=Timer):
+    def __init__(self, str name, timer_cls=Timer):
         """Create new instance of ``RegionNode`` with the given name.
 
         Args:
@@ -29,16 +34,15 @@ class RegionNode:
                 Default: ``region_profiler.utils.Timer``
         """
         self.name = name
-        self.optimized_class = False
+        self.optimized_class = True
         self.timer_cls = timer_cls
         self.timer = self.timer_cls()
         self.cancelled = False
         self.stats = SeqStats()
         self.children = dict()
         self.recursion_depth = 0
-        self.last_event_time = 0
 
-    def enter_region(self):
+    cdef void enter_region(self):
         """Start timing current region.
         """
         if self.recursion_depth == 0:
@@ -49,7 +53,7 @@ class RegionNode:
         self.cancelled = False
         self.recursion_depth += 1
 
-    def cancel_region(self):
+    cdef void cancel_region(self):
         """Cancel current region timing.
 
         Stats will not be updated with the current measurement.
@@ -61,7 +65,7 @@ class RegionNode:
         else:
             self.timer.mark_aux_event()
 
-    def exit_region(self):
+    cdef void exit_region(self):
         """Stop current timing and update stats with the current measurement.
         """
         if self.cancelled:
@@ -75,12 +79,15 @@ class RegionNode:
             else:
                 self.timer.mark_aux_event()
 
-    def get_child(self, name, timer_cls=None):
+    cdef RegionNode get_child(self, str name, timer_cls=None):
         """Get node child with the given name.
 
         This method creates a new child and stores it
         in the inner dictionary if it has not been created yet.
-
+        
+        TODO:
+            Optimize Cython code
+        
         Args:
             name (str): child name
             timer_cls (:obj:`class`, optional): override child timer class
@@ -88,14 +95,15 @@ class RegionNode:
         Returns:
             RegionNode: new or existing child node with the given name
         """
+        cdef RegionNode c
         try:
-            return self.children[name]
+            return <RegionNode> self.children[name]
         except KeyError:
-            c = RegionNode(name, timer_cls or self.timer_cls)
+            c = RegionNode(name, timer_cls if timer_cls is not None else self.timer_cls)
             self.children[name] = c
             return c
 
-    def timer_is_active(self):
+    cdef bool timer_is_active(self):
         """Return True if timer is currently running.
         """
         return self.recursion_depth > 1 or self.recursion_depth == 1 and self.cancelled
@@ -108,36 +116,7 @@ class RegionNode:
             format(str(self), repr(self.stats), self.timer_cls)
 
 
-class _RootNodeStats:
-    """Proxy object that wraps timer in the
-    :py:class:`region_profiler.utils.SeqStats` interface.
-
-    Timer is expected to have the same interface as
-    :py:class:`region_profiler.utils.Timer` object.
-    Proxy properties return current timer values.
-    """
-
-    def __init__(self, timer):
-        self.timer = timer
-
-    @property
-    def count(self):
-        return 1
-
-    @property
-    def total(self):
-        return self.timer.current_elapsed()
-
-    @property
-    def min(self):
-        return self.total
-
-    @property
-    def max(self):
-        return self.total
-
-
-class RootNode(RegionNode):
+cdef class RootNode(RegionNode):
     """An instance of :any:`RootNode` is intended to be used
     as the root of a region node hierarchy.
 
@@ -147,17 +126,17 @@ class RootNode(RegionNode):
     the real stats of previous measurements.
     """
 
-    def __init__(self, name='<root>', timer_cls=Timer):
-        super(RootNode, self).__init__(name, timer_cls)
+    def __init__(self, str name='<root>', timer_cls=Timer):
+        super().__init__(name, timer_cls)
         self.enter_region()
         self.stats = _RootNodeStats(self.timer)
 
-    def cancel_region(self):
+    cdef void cancel_region(self):
         """Prevents root region from being cancelled.
         """
         warnings.warn('Can\'t cancel root region timer', stacklevel=2)
 
-    def exit_region(self):
+    cdef void exit_region(self):
         """Instead of :py:meth:`RegionNode.exit_region` it does not reset
         :py:attr:`timer` attribute thus allowing it to continue timing on reenter.
         """
