@@ -201,6 +201,7 @@ def install(reporter=ConsoleReporter(), chrome_trace_file=None,
         atexit.register(lambda: _profiler.finalize())
     else:
         warnings.warn("region_profiler.install() must be called only once", stacklevel=2)
+    return _profiler
 
 
 def region(name=None, asglobal=False):
