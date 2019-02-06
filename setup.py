@@ -1,10 +1,14 @@
 from setuptools import setup
+from Cython.Build import cythonize
 
 with open('README.rst') as f:
     long_description = ''.join(f.readlines())
 
+cython_module = cythonize("region_profiler/cython/*.pyx", annotate=True)
+
 setup(
     name='region_profiler',
+    ext_modules=cython_module,
     version='0.3.1',
     description='Profile user-defined regions of code without any external tools',
     long_description=long_description,
@@ -14,6 +18,7 @@ setup(
     url='https://github.com/metopa/region_profiler',
     author='Viacheslav Kroilov',
     author_email='slavakroilov@gmail.com',
+    install_requires=['cython'],
     setup_requires=['pytest-runner'],
     tests_require=['pytest', 'pytest-cov==2.6.0', 'codecov'],
     data_files=[('region_profiler', ['LICENSE.rst'])],
