@@ -5,6 +5,7 @@ from unittest import mock
 
 import pytest
 
+import region_profiler.global_instance
 from region_profiler import region, func, install as install_profiler, iter_proxy, RegionProfiler
 import region_profiler.profiler
 from region_profiler.reporters import SilentReporter
@@ -16,7 +17,7 @@ from region_profiler.utils import Timer
 def fresh_region_profiler(monkeypatch):
     """Reset ``region_profiler`` module before a next integration test.
     """
-    region_profiler.profiler._profiler = None
+    region_profiler.global_instance._profiler = None
     atexit_functions = []
     monkeypatch.setattr(atexit, 'register', lambda foo: atexit_functions.append(foo))
     yield None
@@ -32,9 +33,9 @@ def test_reload_works(monkeypatch, multiple_runs):
     """
     reporter = SilentReporter([cols.name])
     with fresh_region_profiler(monkeypatch):
-        assert region_profiler.profiler._profiler is None
+        assert region_profiler.global_instance._profiler is None
         install_profiler(reporter)
-        assert isinstance(region_profiler.profiler._profiler, region_profiler.RegionProfiler)
+        assert isinstance(region_profiler.global_instance._profiler, region_profiler.RegionProfiler)
     assert reporter.rows == [['name'], [RegionProfiler.ROOT_NODE_NAME]]
 
 

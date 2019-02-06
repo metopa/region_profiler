@@ -1,12 +1,7 @@
-import atexit
-import warnings
 from contextlib import contextmanager
 
-from region_profiler.chrome_trace_listener import ChromeTraceListener
-from region_profiler.debug_listener import DebugListener
 from region_profiler.node import RootNode
-from region_profiler.reporters import ConsoleReporter
-from region_profiler.utils import (NullContext, Timer, get_name_by_callsite)
+from region_profiler.utils import (Timer, get_name_by_callsite)
 
 
 class RegionProfiler:
@@ -33,7 +28,7 @@ class RegionProfiler:
 
     ROOT_NODE_NAME = '<main>'
 
-    def __init__(self, timer_cls=Timer, listeners=None):
+    def __init__(self, timer_cls=None, listeners=None):
         """Construct new :py:class:`RegionProfiler`.
 
         Args:
@@ -43,6 +38,8 @@ class RegionProfiler:
                 :py:class:`region_profiler.listener.RegionProfilerListener`, optional):
                 optional list of listeners, that can augment region enter and exit events.
         """
+        if timer_cls is None:
+            timer_cls = Timer
         self.root = RootNode(name=self.ROOT_NODE_NAME, timer_cls=timer_cls)
         self.node_stack = [self.root]
         self.listeners = listeners or []
@@ -173,92 +170,5 @@ class RegionProfiler:
         return self.node_stack[-1]
 
 
-_profiler = None
-"""Global :py:class:`RegionProfiler` instance.
-
-This singleton is initialized using :py:func:`install`.
-"""
 
 
-def install(reporter=ConsoleReporter(), chrome_trace_file=None,
-            debug_mode=False, timer_cls=Timer):
-    """
-    Args:
-        reporter:
-        timer_cls:
-        chrome_trace_file:
-    """
-    global _profiler
-    if _profiler is None:
-        listeners = []
-        if chrome_trace_file:
-            listeners.append(ChromeTraceListener(chrome_trace_file))
-        if debug_mode:
-            listeners.append(DebugListener())
-        _profiler = RegionProfiler(listeners=listeners, timer_cls=timer_cls)
-        _profiler.root.enter_region()
-        atexit.register(lambda: reporter.dump_profiler(_profiler))
-        atexit.register(lambda: _profiler.finalize())
-    else:
-        warnings.warn("region_profiler.install() must be called only once", stacklevel=2)
-    return _profiler
-
-
-def region(name=None, asglobal=False):
-    """
-
-    Args:
-        name:
-        asglobal:
-
-    Returns:
-
-    """
-    if _profiler is not None:
-        return _profiler.region(name, asglobal, 0)
-    else:
-        return NullContext()
-
-
-def func(name=None, asglobal=False):
-    """
-
-    Args:
-        name:
-        asglobal:
-
-    Returns:
-
-    """
-
-    def decorator(fn):
-        nonlocal name
-        if name is None:
-            name = fn.__name__
-
-        name += '()'
-
-        def wrapped(*args, **kwargs):
-            with region(name, asglobal=asglobal):
-                return fn(*args, **kwargs)
-
-        return wrapped
-
-    return decorator
-
-
-def iter_proxy(iterable, name=None, asglobal=False):
-    """
-
-    Args:
-        iterable:
-        asglobal:
-        name:
-
-    Returns:
-
-    """
-    if _profiler is not None:
-        return _profiler.iter_proxy(iterable, name, asglobal, -1)
-    else:
-        return iterable
