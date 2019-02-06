@@ -98,7 +98,7 @@ cdef class Timer:
         self._running = False
         self.last_event_time = 0
 
-    cdef double begin_ts(self):
+    cpdef double begin_ts(self):
         """Start event timestamp.
 
         Returns:
@@ -106,7 +106,7 @@ cdef class Timer:
         """
         return self._begin_ts
 
-    cdef double end_ts(self):
+    cpdef double end_ts(self):
         """Stop event timestamp.
 
         Returns:
@@ -114,7 +114,7 @@ cdef class Timer:
         """
         return self._end_ts
 
-    cdef void start(self):
+    cpdef void start(self):
         """Start new timer measurement.
 
         Call this function again to continue measurements.
@@ -123,7 +123,7 @@ cdef class Timer:
         self.last_event_time = self._begin_ts
         self._running = True
 
-    cdef void stop(self):
+    cpdef void stop(self):
         """Stop timer and add current measurement to total.
 
         Returns:
@@ -134,12 +134,12 @@ cdef class Timer:
             self._end_ts = self.last_event_time
             self._running = False
 
-    cdef void mark_aux_event(self):
+    cpdef void mark_aux_event(self):
         """Update ``last_event_time``.
         """
         self.last_event_time = <double>self.clock()
 
-    cdef bool is_running(self):
+    cpdef bool is_running(self):
         """Check if timer is currently running.
 
         Returns:
@@ -147,7 +147,7 @@ cdef class Timer:
         """
         return self._running
 
-    cdef double elapsed(self):
+    cpdef double elapsed(self):
         """Return duration between `start` and `stop` events.
 
         If timer is running (no :py:meth:`stop` has been called
@@ -158,7 +158,7 @@ cdef class Timer:
         """
         return (self._end_ts - self._begin_ts) if not self._running else 0
 
-    cdef double current_elapsed(self):
+    cpdef double current_elapsed(self):
         """Return duration between `start` and `stop` events or
         duration from last `start` event if no pairing `stop` event occurred.
 

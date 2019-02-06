@@ -43,11 +43,11 @@ cdef class Timer:
     cdef double last_event_time
     cdef bool _running
 
-    cdef double begin_ts(self)
-    cdef double end_ts(self)
-    cdef void start(self)
-    cdef void stop(self)
-    cdef void mark_aux_event(self)
-    cdef bool is_running(self)
-    cdef double elapsed(self)
-    cdef double current_elapsed(self)
+    cpdef double begin_ts(self)
+    cpdef double end_ts(self)
+    cpdef void start(self)
+    cpdef void stop(self)
+    cpdef void mark_aux_event(self)
+    cpdef bool is_running(self)
+    cpdef double elapsed(self)
+    cpdef double current_elapsed(self)

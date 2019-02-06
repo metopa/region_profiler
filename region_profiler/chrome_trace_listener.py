@@ -21,7 +21,7 @@ class ChromeTraceListener(RegionProfilerListener):
     def finalize(self):
         self.f.write(']')
         self.f.close()
-        print('RegionProfiler: Chrome Trace is saved at', self.trace_filename, file=sys.stderr)
+        print('RegionProfiler: Chrome Trace is saved in', self.trace_filename, file=sys.stderr)
 
     def region_entered(self, profiler, region):
         if self.pending_begin_node:

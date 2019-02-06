@@ -24,17 +24,17 @@ cdef class RegionNode:
     cdef readonly str name
     cdef readonly bool optimized_class
     cdef object timer_cls
-    cdef Timer timer
-    cdef bool cancelled
+    cdef readonly Timer timer
+    cdef readonly bool cancelled
     cdef readonly SeqStats stats
     cdef readonly dict children
     cdef int recursion_depth
 
-    cdef void enter_region(self)
+    cpdef void enter_region(self)
 
-    cdef void cancel_region(self)
+    cpdef void cancel_region(self)
 
-    cdef void exit_region(self)
+    cpdef void exit_region(self)
 
     cdef RegionNode get_child(self, str name, timer_cls= *)
 
@@ -61,6 +61,6 @@ cdef class RootNode(RegionNode):
     the real stats of previous measurements.
     """
 
-    cdef void cancel_region(self)
+    cpdef void cancel_region(self)
 
-    cdef void exit_region(self)
+    cpdef void exit_region(self)

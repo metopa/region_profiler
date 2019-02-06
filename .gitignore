@@ -56,3 +56,5 @@ docs/_build/
 
 # PyBuilder
 target/
+region_profiler/cython/*.cpp
+region_profiler/cython/*.html

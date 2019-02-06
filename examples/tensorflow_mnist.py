@@ -11,12 +11,13 @@ Project: https://github.com/aymericdamien/TensorFlow-Examples/
 """
 from __future__ import print_function
 
+import tensorflow as tf
+from tensorflow.examples.tutorials.mnist import input_data
+
+
 import region_profiler as rp
 
 rp.install()
-
-import tensorflow as tf
-from tensorflow.examples.tutorials.mnist import input_data
 
 tf.logging.set_verbosity(tf.logging.ERROR)
 

@@ -42,7 +42,7 @@ cdef class RegionNode:
         self.children = dict()
         self.recursion_depth = 0
 
-    cdef void enter_region(self):
+    cpdef void enter_region(self):
         """Start timing current region.
         """
         if self.recursion_depth == 0:
@@ -53,7 +53,7 @@ cdef class RegionNode:
         self.cancelled = False
         self.recursion_depth += 1
 
-    cdef void cancel_region(self):
+    cpdef void cancel_region(self):
         """Cancel current region timing.
 
         Stats will not be updated with the current measurement.
@@ -65,7 +65,7 @@ cdef class RegionNode:
         else:
             self.timer.mark_aux_event()
 
-    cdef void exit_region(self):
+    cpdef void exit_region(self):
         """Stop current timing and update stats with the current measurement.
         """
         if self.cancelled:
@@ -116,6 +116,34 @@ cdef class RegionNode:
             format(str(self), repr(self.stats), self.timer_cls)
 
 
+cdef class _RootNodeStats:
+    """Proxy object that wraps timer in the
+    :py:class:`region_profiler.utils.SeqStats` interface.
+
+    Timer is expected to have the same interface as
+    :py:class:`region_profiler.utils.Timer` object.
+    Proxy properties return current timer values.
+    """
+    def __init__(self, timer):
+        self.timer = timer
+
+    @property
+    def count(self):
+        return 1
+
+    @property
+    def total(self):
+        return self.timer.current_elapsed()
+
+    @property
+    def min(self):
+        return self.total
+
+    @property
+    def max(self):
+        return self.total
+
+
 cdef class RootNode(RegionNode):
     """An instance of :any:`RootNode` is intended to be used
     as the root of a region node hierarchy.
@@ -131,12 +159,12 @@ cdef class RootNode(RegionNode):
         self.enter_region()
         self.stats = _RootNodeStats(self.timer)
 
-    cdef void cancel_region(self):
+    cpdef void cancel_region(self):
         """Prevents root region from being cancelled.
         """
         warnings.warn('Can\'t cancel root region timer', stacklevel=2)
 
-    cdef void exit_region(self):
+    cpdef void exit_region(self):
         """Instead of :py:meth:`RegionNode.exit_region` it does not reset
         :py:attr:`timer` attribute thus allowing it to continue timing on reenter.
         """
