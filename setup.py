@@ -1,5 +1,5 @@
-from Cython.Build import cythonize
 from setuptools import setup
+from Cython.Build import cythonize
 
 with open('README.rst') as f:
     long_description = ''.join(f.readlines())
