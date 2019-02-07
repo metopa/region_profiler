@@ -9,7 +9,7 @@ cython_module = cythonize("region_profiler/cython/*.pyx", annotate=True)
 setup(
     name='region_profiler',
     ext_modules=cython_module,
-    version='0.3.1',
+    version='0.4',
     description='Profile user-defined regions of code without any external tools',
     long_description=long_description,
     packages=['region_profiler'],

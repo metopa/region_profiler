@@ -37,15 +37,5 @@
      Additional features:
 
      - Real-time Chrome trace export
-     - Speed up profiling with Cython module
+     - Speed up profiling with Cython
      - CSV/human-readable summary export
-
-:TODO: - Append region mode
-       - Region labels
-           - Track func arguments
-           - Track separate iterations
-       - Support Chrome Trace
-       - Export as CSV
-       - Better dump
-       - Fix decorator called before ``install()``
-
