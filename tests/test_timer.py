@@ -1,15 +1,19 @@
 from unittest import mock
 
+import pytest
+
 from region_profiler.utils import Timer
+from region_profiler.cython.utils import Timer as CythonTimer
 
 
-def test_timer_single_shot():
+@pytest.mark.parametrize('timer_cls', [Timer, CythonTimer])
+def test_timer_single_shot(timer_cls):
     """Test that ``Timer`` correctly initializes
     its attributes after a single timer shot.
     """
     mock_clock = mock.Mock()
     mock_clock.side_effect = [10, 25]
-    t = Timer(clock=mock_clock)
+    t = timer_cls(clock=mock_clock)
 
     assert t.begin_ts() == 0
     assert t.end_ts() == 0
@@ -28,7 +32,8 @@ def test_timer_single_shot():
     assert not t.is_running()
 
 
-def test_timer_multiple_shots():
+@pytest.mark.parametrize('timer_cls', [Timer, CythonTimer])
+def test_timer_multiple_shots(timer_cls):
     """Test that ``Timer`` correctly initializes
     its attributes after a multiple timer shots.
     """
@@ -36,7 +41,7 @@ def test_timer_multiple_shots():
     mock_clock.side_effect = [10, 20, 30, 40, 100, 110, 120, 200]
     total = 0
 
-    t = Timer(clock=mock_clock)
+    t = timer_cls(clock=mock_clock)
 
     assert t.begin_ts() == 0
     assert t.end_ts() == 0

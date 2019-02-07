@@ -1,17 +1,21 @@
 import time
 from unittest import mock
 
+import pytest
+
 from region_profiler import RegionProfiler
 from region_profiler.debug_listener import DebugListener
+from region_profiler.cython.profiler import RegionProfiler as CythonRegionProfiler
 
 
-def test_recursive_global_func_call():
+@pytest.mark.parametrize('profiler_cls', [RegionProfiler, CythonRegionProfiler])
+def test_recursive_global_func_call(profiler_cls):
     """Test that global functions are registered correctly.
     """
     mock_clock = mock.Mock()
     mock_clock.side_effect = list(range(0, 100, 1))
     l = DebugListener()
-    rp = RegionProfiler(listeners=[l])
+    rp = profiler_cls(listeners=[l])
 
     @rp.func(asglobal=True)
     def foo(i):

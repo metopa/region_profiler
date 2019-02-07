@@ -1,13 +1,15 @@
 import pytest
 
-from region_profiler import RegionProfiler
+from region_profiler.profiler import RegionProfiler
+from region_profiler.cython.profiler import RegionProfiler as CythonRegionProfiler
 
 
-@pytest.mark.parametrize("iter_cnt", [0, 1, 10])
-def test_iter_proxy_proper_values(iter_cnt):
+@pytest.mark.parametrize('profiler_cls', [RegionProfiler, CythonRegionProfiler])
+@pytest.mark.parametrize('iter_cnt', [0, 1, 10])
+def test_iter_proxy_proper_values(profiler_cls, iter_cnt):
     """Test that iter_proxy properly forwards iterable values.
     """
-    rp = RegionProfiler()
+    rp = profiler_cls()
 
     l = list(range(iter_cnt))
     for i, x in enumerate(rp.iter_proxy(l, 'test_loop')):
@@ -25,11 +27,12 @@ def raise_after_n(n, err):
     raise err
 
 
-@pytest.mark.parametrize("iter_cnt", [0, 1, 10])
-def test_iter_proxy_custom_generator(iter_cnt):
+@pytest.mark.parametrize('profiler_cls', [RegionProfiler, CythonRegionProfiler])
+@pytest.mark.parametrize('iter_cnt', [0, 1, 10])
+def test_iter_proxy_custom_generator(profiler_cls, iter_cnt):
     """Test that iter_proxy properly forwards generator values.
     """
-    rp = RegionProfiler()
+    rp = profiler_cls()
 
     for _ in rp.iter_proxy(raise_after_n(iter_cnt, StopIteration), 'test_loop'):
         pass
@@ -40,11 +43,12 @@ def test_iter_proxy_custom_generator(iter_cnt):
     assert n.recursion_depth == 0  # check that timing is stopped
 
 
-@pytest.mark.parametrize("iter_cnt", [0, 1, 10])
-def test_iter_proxy_custom_exception(iter_cnt):
+@pytest.mark.parametrize('profiler_cls', [RegionProfiler, CythonRegionProfiler])
+@pytest.mark.parametrize('iter_cnt', [0, 1, 10])
+def test_iter_proxy_custom_exception(profiler_cls, iter_cnt):
     """Test that iter_proxy properly handles custom generator exceptions.
     """
-    rp = RegionProfiler()
+    rp = profiler_cls()
     try:
         for _ in rp.iter_proxy(raise_after_n(iter_cnt, RuntimeError), 'test_loop'):
             pass
@@ -58,5 +62,3 @@ def test_iter_proxy_custom_exception(iter_cnt):
     assert n.stats.count == iter_cnt + 1
     # iteration that throws custom exception is calculated
     assert n.recursion_depth == 0  # check that timing is stopped
-
-# TODO listener test
