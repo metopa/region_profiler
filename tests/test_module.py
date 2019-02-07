@@ -43,7 +43,7 @@ def test_reload_works(monkeypatch, multiple_runs):
     reporter = SilentReporter([cols.name])
     with fresh_region_profiler(monkeypatch):
         assert region_profiler.global_instance._profiler is None
-        install_profiler(reporter)
+        install_profiler(reporter, use_cython=False)
         assert isinstance(region_profiler.global_instance._profiler,
                           RegionProfiler)
     assert reporter.rows == [['name'], [RegionProfiler.ROOT_NODE_NAME]]
