@@ -2,8 +2,8 @@ from unittest import mock
 
 import pytest
 
-from region_profiler.utils import Timer
 from region_profiler.cython.utils import Timer as CythonTimer
+from region_profiler.utils import Timer
 
 
 @pytest.mark.parametrize('timer_cls', [Timer, CythonTimer])

@@ -1,5 +1,5 @@
 import region_profiler as rp
-from region_profiler.utils import pretty_print_time, SeqStats
+from region_profiler.utils import SeqStats, pretty_print_time
 
 
 def fact(x):

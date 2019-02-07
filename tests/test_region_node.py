@@ -3,11 +3,11 @@ from unittest import mock
 
 import pytest
 
-from region_profiler.utils import Timer
+from region_profiler.cython.node import RegionNode as CythonRegionNode
+from region_profiler.cython.node import RootNode as CythonRootNode
 from region_profiler.cython.utils import Timer as CythonTimer
 from region_profiler.node import RegionNode, RootNode
-from region_profiler.utils import SeqStats
-from region_profiler.cython.node import RegionNode as CythonRegionNode, RootNode as CythonRootNode
+from region_profiler.utils import SeqStats, Timer
 
 
 @pytest.mark.parametrize('node_cls', [RegionNode, CythonRegionNode])

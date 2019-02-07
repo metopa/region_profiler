@@ -4,8 +4,9 @@ from unittest import mock
 import pytest
 
 from region_profiler import RegionProfiler
+from region_profiler.cython.profiler import \
+    RegionProfiler as CythonRegionProfiler
 from region_profiler.debug_listener import DebugListener
-from region_profiler.cython.profiler import RegionProfiler as CythonRegionProfiler
 
 
 @pytest.mark.parametrize('profiler_cls', [RegionProfiler, CythonRegionProfiler])

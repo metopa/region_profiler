@@ -6,13 +6,16 @@ from unittest import mock
 import pytest
 
 import region_profiler.global_instance
-from region_profiler import region, func, install as install_profiler, iter_proxy, RegionProfiler
 import region_profiler.profiler
-from region_profiler.cython.profiler import RegionProfiler as CythonRegionProfiler
-from region_profiler.reporters import SilentReporter
+from region_profiler import RegionProfiler, func
+from region_profiler import install as install_profiler
+from region_profiler import iter_proxy, region
 from region_profiler import reporter_columns as cols
-from region_profiler.utils import Timer
+from region_profiler.cython.profiler import \
+    RegionProfiler as CythonRegionProfiler
 from region_profiler.cython.utils import Timer as CythonTimer
+from region_profiler.reporters import SilentReporter
+from region_profiler.utils import Timer
 
 
 def get_timer_cls(use_cython):
@@ -219,7 +222,7 @@ def test_automatic_naming(monkeypatch, use_cython):
     expected = [['name'],
                 [RegionProfiler.ROOT_NODE_NAME],
                 ['foo()'],
-                ['foo() <test_module.py:210>'],
-                ['foo() <test_module.py:211>']]
+                ['foo() <test_module.py:213>'],
+                ['foo() <test_module.py:214>']]
 
     assert reporter.rows == expected

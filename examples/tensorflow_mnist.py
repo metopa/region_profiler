@@ -14,7 +14,6 @@ from __future__ import print_function
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
-
 import region_profiler as rp
 
 rp.install()

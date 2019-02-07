@@ -1,10 +1,11 @@
 import atexit
 import warnings
 
-from region_profiler.profiler import RegionProfiler
-from region_profiler.cython.profiler import RegionProfiler as CythonRegionProfiler
 from region_profiler.chrome_trace_listener import ChromeTraceListener
+from region_profiler.cython.profiler import \
+    RegionProfiler as CythonRegionProfiler
 from region_profiler.debug_listener import DebugListener
+from region_profiler.profiler import RegionProfiler
 from region_profiler.reporters import ConsoleReporter
 from region_profiler.utils import NullContext
 

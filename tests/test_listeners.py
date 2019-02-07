@@ -33,4 +33,3 @@ def test_debug_listener(capsys):
     assert 'Exited a at 8' in err
     assert 'Exited foo() at 9' in err
     assert 'Finalizing' in err
-

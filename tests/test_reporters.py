@@ -1,8 +1,8 @@
 import pytest
 
 from region_profiler import RegionProfiler
-from region_profiler.reporters import *
 from region_profiler import reporter_columns as cols
+from region_profiler.reporters import *
 
 
 class FixedStats:

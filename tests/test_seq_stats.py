@@ -1,7 +1,7 @@
 import pytest
 
-from region_profiler.utils import SeqStats
 from region_profiler.cython.utils import SeqStats as CythonSeqStats
+from region_profiler.utils import SeqStats
 
 
 @pytest.mark.parametrize('stats_cls', [SeqStats, CythonSeqStats])

@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 
 from region_profiler.node import RootNode
-from region_profiler.utils import (Timer, get_name_by_callsite)
+from region_profiler.utils import Timer, get_name_by_callsite
 
 
 class RegionProfiler:
@@ -168,7 +168,3 @@ class RegionProfiler:
                 node of the region as defined above.
         """
         return self.node_stack[-1]
-
-
-
-
