@@ -1,22 +1,22 @@
-from setuptools import setup
-from Cython.Build import cythonize
+from setuptools import setup, Extension
 
 with open('README.rst') as f:
     long_description = ''.join(f.readlines())
 
-
 setup_args = {
     'name': 'region_profiler',
-    'version': '0.4.3',
+    'version': '0.5',
     'description': 'Profile user-defined regions of code without any external tools',
     'long_description': long_description,
     'packages': ['region_profiler'],
+    'package_dir': {'region_profiler': 'region_profiler'},
+    'package_data': {'region_profiler': ['*.pxd', '*.py']},
     'keywords': 'timing, timer, profiling, profiler',
     'license': 'MIT',
     'url': 'https://github.com/metopa/region_profiler',
     'author': 'Viacheslav Kroilov',
     'author_email': 'slavakroilov@gmail.com',
-    'setup_requires': ['pytest-runner', 'cython>=0.x'],
+    'setup_requires': ['pytest-runner', 'setuptools>=18.0', 'cython'],
     'tests_require': ['cython', 'pytest', 'pytest-cov==::2.6.0', 'codecov'],
     'data_files': [('region_profiler', ['LICENSE.rst'])],
     'classifiers': [
@@ -34,10 +34,16 @@ setup_args = {
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Quality Assurance',
         'Topic :: Utilities'
-    ]
+    ],
+    'ext_modules': [Extension('region_profiler.cython.listener', language='c++',
+                              sources=['region_profiler/cython/listener.pyx']),
+                    Extension('region_profiler.cython.node', language='c++',
+                              sources=['region_profiler/cython/node.pyx']),
+                    Extension('region_profiler.cython.profiler', language='c++',
+                              sources=['region_profiler/cython/profiler.pyx']),
+                    Extension('region_profiler.cython.utils', language='c++',
+                              sources=['region_profiler/cython/utils.pyx'])
+                    ],
 }
-
-cython_module = cythonize("region_profiler/cython/*.pyx")
-setup_args.update({'ext_modules': cython_module})
 
 setup(**setup_args)
