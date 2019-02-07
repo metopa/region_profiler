@@ -3,8 +3,6 @@
 
 from region_profiler.utils import default_clock
 
-from region_profiler.cython.utils cimport SeqStats, Timer
-
 from libcpp cimport bool
 
 cdef class SeqStats:
@@ -27,7 +25,7 @@ cdef class SeqStats:
         self.min_ = min
         self.max_ = max
 
-    cdef void add(self, double x):
+    cpdef void add(self, double x):
         """Update statistics with the next value of a sequence.
 
         Args:

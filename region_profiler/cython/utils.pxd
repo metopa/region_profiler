@@ -21,7 +21,7 @@ cdef class SeqStats:
     cdef double min_
     cdef double max_
 
-    cdef void add(self, double x)
+    cpdef void add(self, double x)
 
 
 cdef class Timer:
