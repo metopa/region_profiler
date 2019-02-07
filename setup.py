@@ -1,23 +1,13 @@
-import warnings
-
 from setuptools import setup
-
-try:
-    from Cython.Build import cythonize
-
-    has_cython = True
-except ImportError:
-    has_cython = False
-    warnings.warn('Faster profiling with Cython is not available. '
-                  'You can enable it by installing Cython first and '
-                  'then reinstalling region_profiler. Cython is required to run tests.')
+from Cython.Build import cythonize
 
 with open('README.rst') as f:
     long_description = ''.join(f.readlines())
 
+
 setup_args = {
     'name': 'region_profiler',
-    'version': '0.4.1',
+    'version': '0.4.3',
     'description': 'Profile user-defined regions of code without any external tools',
     'long_description': long_description,
     'packages': ['region_profiler'],
@@ -26,7 +16,7 @@ setup_args = {
     'url': 'https://github.com/metopa/region_profiler',
     'author': 'Viacheslav Kroilov',
     'author_email': 'slavakroilov@gmail.com',
-    'setup_requires': ['pytest-runner'],
+    'setup_requires': ['pytest-runner', 'cython>=0.x'],
     'tests_require': ['cython', 'pytest', 'pytest-cov==::2.6.0', 'codecov'],
     'data_files': [('region_profiler', ['LICENSE.rst'])],
     'classifiers': [
@@ -47,8 +37,7 @@ setup_args = {
     ]
 }
 
-if has_cython:
-    cython_module = cythonize("region_profiler/cython/*.pyx", annotate=True)
-    setup_args.update({'ext_modules': cython_module})
+cython_module = cythonize("region_profiler/cython/*.pyx")
+setup_args.update({'ext_modules': cython_module})
 
 setup(**setup_args)
