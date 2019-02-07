@@ -79,7 +79,7 @@ cdef class RegionNode:
             else:
                 self.timer.mark_aux_event()
 
-    cdef RegionNode get_child(self, str name, timer_cls=None):
+    cpdef RegionNode get_child(self, str name, timer_cls=None):
         """Get node child with the given name.
 
         This method creates a new child and stores it
