@@ -81,7 +81,7 @@ cdef class RegionProfiler:
             :py:class:`region_profiler.node.RegionNode`: node of the region.
         """
         if name is None:
-            name = get_name_by_callsite(indirect_call_depth + 2)
+            name = get_name_by_callsite(indirect_call_depth + 1)
         cdef RegionNode parent = self.root if asglobal is True else self.current_node_c()
         self.node_stack.append(parent.get_child(name))
         self._enter_current_region()
@@ -132,7 +132,7 @@ cdef class RegionProfiler:
         """
         cdef object it = iter(iterable)
         if name is None:
-            name = get_name_by_callsite(indirect_call_depth + 2)
+            name = get_name_by_callsite(indirect_call_depth)
         cdef RegionNode parent = self.root if asglobal is True else self.current_node_c()
         cdef RegionNode node = parent.get_child(name)
 

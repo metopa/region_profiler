@@ -117,7 +117,7 @@ class RegionProfiler:
         """
         it = iter(iterable)
         if name is None:
-            name = get_name_by_callsite(indirect_call_depth + 2)
+            name = get_name_by_callsite(indirect_call_depth + 1)
         parent = self.root if asglobal else self.current_node
         node = parent.get_child(name)
 

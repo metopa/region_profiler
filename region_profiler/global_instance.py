@@ -98,6 +98,6 @@ def iter_proxy(iterable, name=None, asglobal=False):
 
     """
     if _profiler is not None:
-        return _profiler.iter_proxy(iterable, name, asglobal, -1)
+        return _profiler.iter_proxy(iterable, name, asglobal, 0)
     else:
         return iterable
