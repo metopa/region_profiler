@@ -20,7 +20,7 @@ setup(
     author_email='slavakroilov@gmail.com',
     install_requires=['cython'],
     setup_requires=['pytest-runner'],
-    tests_require=['pytest', 'pytest-cov==2.6.0', 'codecov'],
+    tests_require=['cython', 'pytest', 'pytest-cov==2.6.0', 'codecov'],
     data_files=[('region_profiler', ['LICENSE.rst'])],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
