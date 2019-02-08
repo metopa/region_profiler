@@ -219,7 +219,7 @@ Then you can open the resulting log in `<chrome://tracing>`_
 (obviously, you'd need Chrome browser) for viewing Flame graph of your app execution.
 The following Flame graph is for `<examples/tensorflow_mnist.py>`_ sample program.
 
-.. image:: examples/chrome_tracing.png
+.. image:: https://github.com/metopa/region_profiler/raw/master/examples/chrome_tracing.png
 
 
 Documentation
