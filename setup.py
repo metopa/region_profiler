@@ -5,7 +5,7 @@ with open('README.rst') as f:
 
 setup_args = {
     'name': 'region_profiler',
-    'version': '0.5',
+    'version': '0.5.4',
     'description': 'Profile user-defined regions of code without any external tools',
     'long_description': long_description,
     'packages': ['region_profiler'],
@@ -20,7 +20,7 @@ setup_args = {
     'tests_require': ['cython', 'pytest', 'pytest-cov==2.6.0', 'codecov'],
     'data_files': [('region_profiler', ['LICENSE.rst'])],
     'classifiers': [
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
