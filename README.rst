@@ -169,7 +169,7 @@ The profiler summary would look like this. Note that ``NN`` region appears 4 tim
   . . . . layer 2      20.01 ms       0.16%
   . . . . out layer    2.089 ms       0.02%
 
-In order to merge these timing, we can declare the ``NN`` region as global::
+In order to merge these timings, ``NN`` region should be declared as global::
 
   class NeuralNet(tfe.Network):
       def __init__(self):
@@ -206,11 +206,21 @@ In this case the summary looks like this::
   . . accuracy_fn()    86.70 ms       0.70%
 
 
-Chrome trace
+Chrome Trace
 ------------
 
-Alternative reporters
----------------------
+Region Profiler may output log suitable for `Chrome Trace Viewer <https://aras-p.info/blog/2017/01/23/Chrome-Tracing-as-Profiler-Frontend/>`_.
+
+In order to enable such logging, just pass log filename to ``install()`` function::
+
+  rp.install(chrome_trace_file='trace.json')
+
+Then you can open the resulting log in `<chrome://tracing>`_
+(obviously, you'd need Chrome browser) for viewing Flame graph of your app execution.
+The following Flame graph is for `<examples/tensorflow_mnist.py>`_ sample program.
+
+.. image:: examples/chrome_tracing.png
+
 
 Documentation
 =============
