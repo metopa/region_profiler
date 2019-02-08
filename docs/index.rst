@@ -6,14 +6,16 @@
 Region Profiler - handy Python profiler
 #######################################
 
-
+.. image:: https://badge.fury.io/py/region-profiler.svg
+    :target: https://badge.fury.io/py/region-profiler
+.. image:: https://readthedocs.org/projects/region-profiler/badge/?version=latest
+    :target: https://region-profiler.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 .. image:: https://travis-ci.com/metopa/region_profiler.svg?branch=master
     :target: https://travis-ci.com/metopa/region_profiler
 .. image:: https://codecov.io/gh/metopa/region_profiler/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/metopa/region_profiler
-.. image:: https://readthedocs.org/projects/region-profiler/badge/?version=latest
-    :target: https://region-profiler.readthedocs.io/en/latest/?badge=latest
-    :alt: Documentation Status
+
 
 Mark regions using ``with``-statements and decorators.
 Time region hierarchy and get detailed console report as well as Chrome Trace log.
@@ -23,7 +25,6 @@ Contents
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    getting_started
    documentation
@@ -77,7 +78,7 @@ Enable profiling by calling :func:`region_profiler.install`::
 
 See console report and flame graph in Chrome Trace Viewer::
 
-    name                    total  % of total
+  name                    total  % of total
   -------------------  --------  ----------
   <main>                12.44 s     100.00%
   . train               11.64 s      93.51%
@@ -93,7 +94,6 @@ See console report and flame graph in Chrome Trace Viewer::
   . . out layer        444.0 ms       3.57%
 
 .. image:: https://github.com/metopa/region_profiler/raw/master/examples/chrome_tracing.png
-
 
 
 Features

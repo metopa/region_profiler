@@ -1,13 +1,15 @@
 Region Profiler - handy Python profiler
 #######################################
 
+.. image:: https://badge.fury.io/py/region-profiler.svg
+    :target: https://badge.fury.io/py/region-profiler
+.. image:: https://readthedocs.org/projects/region-profiler/badge/?version=latest
+    :target: https://region-profiler.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 .. image:: https://travis-ci.com/metopa/region_profiler.svg?branch=master
     :target: https://travis-ci.com/metopa/region_profiler
 .. image:: https://codecov.io/gh/metopa/region_profiler/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/metopa/region_profiler
-.. image:: https://readthedocs.org/projects/region-profiler/badge/?version=latest
-    :target: https://region-profiler.readthedocs.io/en/latest/?badge=latest
-    :alt: Documentation Status
 
 Mark regions using ``with``-statements and decorators.
 Time region hierarchy and get detailed console report as well as Chrome Trace log.
@@ -71,8 +73,8 @@ or from sources::
     cd region_profiler
     python setup.py install
 
-Tutorial
---------
+Example
+-------
 
 Mark some code regions for profiling::
 
@@ -108,7 +110,7 @@ Mark some code regions for profiling::
           with rp.region('backward'):         # <<<<<
               optimizer.apply_gradients(grad(neural_net, x_batch, y_batch))
 
-Enable profiling by calling :func:`region_profiler.install`::
+Enable profiling by calling ``region_profiler.install``::
 
   if __name__ == '__main__':
       rp.install(chrome_trace_file='trace.json')
@@ -151,7 +153,7 @@ The main API consists of these functions:
 
   - ``name`` - region name.
     If omitted, an automatic name in format ``func() <filename.py:lineno>`` is used.
-  - ``as_global`` - mark region as global. See `Global regions`_ section.
+  - ``as_global`` - mark region as global.
 
 ``region_profiler.func()``
   Function decorator that wraps the marked function in a region.
@@ -159,7 +161,7 @@ The main API consists of these functions:
 
   - ``name`` - region name.
     If omitted, an automatic name in format ``func()`` is used.
-  - ``as_global`` - mark region as global. See `Global regions`_ section.
+  - ``as_global`` - mark region as global.
 
 ``region_profiler.iter_proxy()``
   Iterable object wrapper. Measures time spent in ``__next__`` on each iteration.
@@ -168,7 +170,7 @@ The main API consists of these functions:
 
   - ``name`` - region name.
     If omitted, an automatic name in format ``func() <filename.py:lineno>`` is used.
-  - ``as_global`` - mark region as global. See `Global regions`_ section.
+  - ``as_global`` - mark region as global.
 
 
 License
