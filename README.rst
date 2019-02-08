@@ -1,5 +1,5 @@
 Region Profiler - handy Python profiler
-###########################################
+#######################################
 
 .. image:: https://travis-ci.com/metopa/region_profiler.svg?branch=master
     :target: https://travis-ci.com/metopa/region_profiler
