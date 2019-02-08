@@ -18,14 +18,14 @@ Features
 ========
 
 - **Measure only what you need.** See timing for regions you've marked
-  and never waste time on looking at things your not interested in.
+  and never waste time on looking at things you're not interested in.
 - **Measure third party libraries.** You can mark regions inside arbitrary Python package.
   Just don't forget to rollback changes after you've done :)
   Again, only marked regions count. No need to see timings for unfamiliar library internals.
 - **No need to use external tools** (like kernprof) to gather profiling data.
   Profile from within your application and use usual command to run it.
 - **Average region overhead is 3-10 us** (Python 3.7, Intel Core i5).
-- **Chrome Trace log** generation.
+- **Chrome Trace log generation.**
 - **Table or CSV report format.**
 - **Only Cython dependency.**
 
