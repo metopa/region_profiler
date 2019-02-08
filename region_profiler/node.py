@@ -7,7 +7,7 @@ class RegionNode:
     """RegionNode represents a single entry in a region tree.
 
     It contains a builtin timer for measuring the time, spent
-    in the corresponding region. It keeps a track of
+    in the corresponding region. It keeps track of
     the count, sum, max and min measurements.
     These statistics can be accessed through :py:attr:`stats` attribute.
 

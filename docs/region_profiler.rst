@@ -4,6 +4,38 @@ region\_profiler package
 Submodules
 ----------
 
+region\_profiler.chrome\_trace\_listener module
+-----------------------------------------------
+
+.. automodule:: region_profiler.chrome_trace_listener
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+region\_profiler.debug\_listener module
+---------------------------------------
+
+.. automodule:: region_profiler.debug_listener
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+region\_profiler.global\_instance module
+----------------------------------------
+
+.. automodule:: region_profiler.global_instance
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+region\_profiler.listener module
+--------------------------------
+
+.. automodule:: region_profiler.listener
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 region\_profiler.node module
 ----------------------------
 

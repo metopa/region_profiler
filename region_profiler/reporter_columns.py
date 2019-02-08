@@ -22,6 +22,7 @@ def as_column(print_name=None, name=None):
     def decorate(func):
         setattr(func, 'column_name', name or func.__name__)
         setattr(func, 'column_print_name', print_name or func.column_name.replace('_', ' '))
+        setattr(func, '__doc__', 'Column provider. Retrieves {}.'.format(func.column_print_name))
         return func
     return decorate
 

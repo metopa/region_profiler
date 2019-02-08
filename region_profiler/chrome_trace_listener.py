@@ -6,7 +6,17 @@ from region_profiler.listener import RegionProfilerListener
 
 
 class ChromeTraceListener(RegionProfilerListener):
+    """This listener produces a log, suitable for Chrome Trace Viewer.
+
+    Learn more about `Chrome Trace Viewer
+    <https://aras-p.info/blog/2017/01/23/Chrome-Tracing-as-Profiler-Frontend/>`_.
+    """
     def __init__(self, trace_filename):
+        """Construct ChromeTraceListener.
+
+        Args:
+            trace_filename: output .json file
+        """
         self.trace_filename = trace_filename
         self.f = open(trace_filename, 'w')
         self.pending_begin_node = None
@@ -25,7 +35,7 @@ class ChromeTraceListener(RegionProfilerListener):
 
     def region_entered(self, profiler, region):
         if self.pending_begin_node:
-            self.write_b_event(profiler, self.pending_begin_node)
+            self._write_b_event(profiler, self.pending_begin_node)
         self.pending_begin_node = region
         self.last_canceled_node = None
 
@@ -40,19 +50,19 @@ class ChromeTraceListener(RegionProfilerListener):
             else:
                 self.last_canceled_node = None
 
-            self.write_b_event(profiler, self.pending_begin_node)
+            self._write_b_event(profiler, self.pending_begin_node)
             self.pending_begin_node = None
-        self.write_e_event(profiler, region)
+        self._write_e_event(profiler, region)
 
     def region_canceled(self, profiler, region):
         self.last_canceled_node = region
 
-    def write_b_event(self, profiler, region):
-        self.write_event(region.name, int(region.timer.begin_ts() * 1000000), 'B')
+    def _write_b_event(self, profiler, region):
+        self._write_event(region.name, int(region.timer.begin_ts() * 1000000), 'B')
 
-    def write_e_event(self, profiler, region):
-        self.write_event(region.name, int(region.timer.end_ts() * 1000000), 'E')
+    def _write_e_event(self, profiler, region):
+        self._write_event(region.name, int(region.timer.end_ts() * 1000000), 'E')
 
-    def write_event(self, name, ts, event_type):
+    def _write_event(self, name, ts, event_type):
         self.f.write(',\n{{"name": "{}", "ph": "{}", "ts": {}, "pid": {}, "tid": {}}}'.
                      format(name, event_type, ts, os.getpid(), threading.get_ident()))

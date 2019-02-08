@@ -66,10 +66,9 @@ def default_clock():
 class Timer:
     """Simple timer.
 
-    Allows to measure duration
-    between `start` and `stop` events.
+    Allows to measure duration between `start` and `stop` events.
 
-    By default, measurement is done with a second scale.
+    By default, measurement is done on a fractions of a second scale.
     This can be changed by providing a different clock in constructor.
 
     The duration can be retrieved using

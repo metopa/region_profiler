@@ -21,9 +21,6 @@ class RegionProfiler:
     see package-level function :py:func:`region_profiler.install`,
     :py:func:`region_profiler.region`, :py:func:`region_profiler.func`,
     and :py:func:`region_profiler.iter_proxy`.
-
-    Todo:
-        Code examples
     """
 
     ROOT_NODE_NAME = '<main>'
@@ -55,10 +52,15 @@ class RegionProfiler:
         it enters a region with the specified name in the current context
         on invocation and leaves it on ``with`` block exit.
 
+        Examples::
+
+            with rp.region('A'):
+                ...
+
         Args:
             name (:py:class:`str`, optional): region name.
                 If None, the name is deducted from region location in source
-            asglobal (bool): enter the region from root context, no current one.
+            asglobal (bool): enter the region from root context, not a current one.
                 May be used to merge stats from different call paths
             indirect_call_depth (:py:class:`int`, optional): adjust call depth
                 to correctly identify the callsite position for automatic naming
@@ -76,16 +78,22 @@ class RegionProfiler:
         self.node_stack.pop()
 
     def func(self, name=None, asglobal=False):
-        """
+        """Decorator for entering region on a function call.
+
+        Examples::
+
+            @rp.func()
+            def foo():
+                ...
 
         Args:
             name (:py:class:`str`, optional): region name.
                 If None, the name is deducted from region location in source
-            asglobal (bool): enter the region from root context, no current one.
+            asglobal (bool): enter the region from root context, not a current one.
                 May be used to merge stats from different call paths
 
         Returns:
-
+            Callable: a decorator for wrapping a function
         """
 
         def decorator(fn):
@@ -104,16 +112,34 @@ class RegionProfiler:
         return decorator
 
     def iter_proxy(self, iterable, name=None, asglobal=False, indirect_call_depth=0):
-        """
+        """Wraps an iterable and profiles :func:`next()` calls on this iterable.
+
+        This proxy may be useful, when the iterable is some data loader,
+        that performs data retrieval on each iteration.
+        For instance, it may pull data from an asynchronous process.
+
+        Such proxy was used to identify that when receiving a batch of
+        8 samples from a loader process, first 5 samples were loaded immediately
+        (because they were computed asynchronously during the loop body),
+        but then it stalled on the last 3 iterations meaning that loading had
+        bigger latency than the loop body.
+
+        Examples::
+
+            for batch in rp.iter_proxy(loader):
+                ...
 
         Args:
-            iterable:
-            name:
-            asglobal:
-            indirect_call_depth:
+            iterable (Iterable): an iterable to be wrapped
+            name (:py:class:`str`, optional): region name.
+                If None, the name is deducted from region location in source
+            asglobal (bool): enter the region from root context, not a current one.
+                May be used to merge stats from different call paths
+            indirect_call_depth (:py:class:`int`, optional): adjust call depth
+                to correctly identify the callsite position for automatic naming
 
         Returns:
-
+            Iterable: an iterable, that yield same data as the passed one
         """
         it = iter(iterable)
         if name is None:
@@ -165,6 +191,6 @@ class RegionProfiler:
 
         Returns:
             :py:class:`region_profiler.node.RegionNode`:
-                node of the region as defined above.
+                node of the region as defined above
         """
         return self.node_stack[-1]
