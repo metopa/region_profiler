@@ -11,6 +11,7 @@ class RegionProfilerListener:
     - Cancel region
     - Finish profiling
     """
+
     @abstractmethod
     def finalize(self):
         """Hook 'Finish profiling' event.

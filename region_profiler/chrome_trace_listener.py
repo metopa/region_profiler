@@ -11,6 +11,7 @@ class ChromeTraceListener(RegionProfilerListener):
     Learn more about `Chrome Trace Viewer
     <https://aras-p.info/blog/2017/01/23/Chrome-Tracing-as-Profiler-Frontend/>`_.
     """
+
     def __init__(self, trace_filename):
         """Construct ChromeTraceListener.
 
