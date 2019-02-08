@@ -15,7 +15,7 @@ def test_pretty_print_time():
     assert pretty_print_time(0.00013244) == '132.4 us'
     assert pretty_print_time(0.000013244) == '13.24 us'
     assert pretty_print_time(0.0000013244) == '1.324 us'
-    assert pretty_print_time(0.00000013244) == '132.44 ns'
+    assert pretty_print_time(0.00000013244) == '132 ns'
 
 
 def test_null_context():
