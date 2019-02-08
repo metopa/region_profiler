@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 
 from region_profiler.cython.profiler import \
@@ -33,6 +35,8 @@ def raise_after_n(n, err):
 def test_iter_proxy_custom_generator(profiler_cls, iter_cnt):
     """Test that iter_proxy properly forwards generator values.
     """
+    if sys.version_info >= (3, 7):
+        pytest.skip('It is not allowed to throw StopIteration from generator after Python 3.7')
     rp = profiler_cls()
 
     for _ in rp.iter_proxy(raise_after_n(iter_cnt, StopIteration), 'test_loop'):
