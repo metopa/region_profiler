@@ -248,4 +248,4 @@ def pretty_print_time(sec):
             return '{:.3f} {}'.format(sec, unit)
         sec *= 1000
 
-    return '{} ns'.format(sec)
+    return '{} ns'.format(int(sec))
