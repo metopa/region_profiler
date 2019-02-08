@@ -6,18 +6,6 @@
 Region Profiler - handy Python profiler
 #######################################
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
-
 
 .. image:: https://travis-ci.com/metopa/region_profiler.svg?branch=master
     :target: https://travis-ci.com/metopa/region_profiler
@@ -29,6 +17,19 @@ Indices and tables
 
 Mark regions using ``with``-statements and decorators.
 Time region hierarchy and get detailed console report as well as Chrome Trace log.
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
 
 Features
 ========
@@ -243,7 +244,7 @@ The following Flame graph is for `<examples/tensorflow_mnist.py>`_ sample progra
 Documentation
 =============
 
-You can find complete API reference `here <https://readthedocs.org/projects/region-profiler/>`_.
+You can find complete API reference `here <https://region-profiler.readthedocs.io/en/latest/region_profiler.html>`_.
 
 The main API consists of these functions:
 
