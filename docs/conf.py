@@ -25,9 +25,9 @@ copyright = '2019, Viacheslav Kroilov'
 author = 'Viacheslav Kroilov'
 
 # The short X.Y version
-version = '1.0'
+version = '0.9'
 # The full version, including alpha/beta/rc tags
-release = '1.0'
+release = '0.9 beta'
 
 
 # -- General configuration ---------------------------------------------------
