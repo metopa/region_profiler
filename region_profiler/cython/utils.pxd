@@ -37,10 +37,10 @@ cdef class Timer:
     :py:meth:`current_elapsed` or :py:meth:`total_elapsed()`.
     """
 
-    cdef object clock
+    cdef readonly object clock
     cdef double _begin_ts
     cdef double _end_ts
-    cdef double last_event_time
+    cdef readonly double last_event_time
     cdef bool _running
 
     cpdef double begin_ts(self)
