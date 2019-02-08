@@ -225,7 +225,7 @@ The following Flame graph is for `<examples/tensorflow_mnist.py>`_ sample progra
 Documentation
 =============
 
-You can find complete API reference `here <https://readthedocs.org/projects/region-profiler/>`_.
+You can find complete API reference `here <https://region-profiler.readthedocs.io/en/latest/region_profiler.html>`_.
 
 The main API consists of these functions:
 
