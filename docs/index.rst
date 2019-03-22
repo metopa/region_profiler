@@ -109,7 +109,7 @@ Features
 - **Average region overhead is 3-10 us** (Python 3.7, Intel Core i5).
 - **Chrome Trace log generation.**
 - **Table or CSV report format.**
-- **Only Cython dependency.**
+- **No dependencies.**
 
 Why another Python profiler
 ===========================

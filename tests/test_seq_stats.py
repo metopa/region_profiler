@@ -1,10 +1,9 @@
 import pytest
 
-from region_profiler.cython.utils import SeqStats as CythonSeqStats
 from region_profiler.utils import SeqStats
 
 
-@pytest.mark.parametrize('stats_cls', [SeqStats, CythonSeqStats])
+@pytest.mark.parametrize('stats_cls', [SeqStats])
 def test_seq_stats(stats_cls):
     values = [5, 44, 6, 3, 7]
 

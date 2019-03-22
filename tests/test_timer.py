@@ -2,11 +2,10 @@ from unittest import mock
 
 import pytest
 
-from region_profiler.cython.utils import Timer as CythonTimer
 from region_profiler.utils import Timer
 
 
-@pytest.mark.parametrize('timer_cls', [Timer, CythonTimer])
+@pytest.mark.parametrize('timer_cls', [Timer])
 def test_timer_single_shot(timer_cls):
     """Test that ``Timer`` correctly initializes
     its attributes after a single timer shot.
@@ -32,7 +31,7 @@ def test_timer_single_shot(timer_cls):
     assert not t.is_running()
 
 
-@pytest.mark.parametrize('timer_cls', [Timer, CythonTimer])
+@pytest.mark.parametrize('timer_cls', [Timer])
 def test_timer_multiple_shots(timer_cls):
     """Test that ``Timer`` correctly initializes
     its attributes after a multiple timer shots.

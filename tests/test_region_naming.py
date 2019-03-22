@@ -1,11 +1,9 @@
 import pytest
 
-from region_profiler.cython.profiler import \
-    RegionProfiler as CythonRegionProfiler
 from region_profiler.profiler import RegionProfiler
 
 
-@pytest.mark.parametrize('profiler_cls', [RegionProfiler, CythonRegionProfiler])
+@pytest.mark.parametrize('profiler_cls', [RegionProfiler])
 def test_basic_naming(profiler_cls):
     """Test basic checkpoint naming works.
     """
@@ -33,7 +31,7 @@ def test_basic_naming(profiler_cls):
     assert children['d'].children['x'].children == {}
 
 
-@pytest.mark.parametrize('profiler_cls', [RegionProfiler, CythonRegionProfiler])
+@pytest.mark.parametrize('profiler_cls', [RegionProfiler])
 def test_automatic_naming(profiler_cls):
     """Test that region name is correctly deduced from the code location.
     """
@@ -49,16 +47,16 @@ def test_automatic_naming(profiler_cls):
     for _ in rp.iter_proxy([1, 2, 3]):
         pass
 
-    r1 = 'test_automatic_naming() <test_region_naming.py:46>'
-    r2 = 'foo() <test_region_naming.py:43>'
-    r3 = 'test_automatic_naming() <test_region_naming.py:49>'
+    r1 = 'test_automatic_naming() <test_region_naming.py:44>'
+    r2 = 'foo() <test_region_naming.py:41>'
+    r3 = 'test_automatic_naming() <test_region_naming.py:47>'
     assert sorted(list(rp.root.children.keys())) == sorted([r1, r3])
     assert rp.root.children[r1].name == r1
     assert rp.root.children[r3].name == r3
     assert list(rp.root.children[r1].children.keys()) == [r2]
 
 
-@pytest.mark.parametrize('profiler_cls', [RegionProfiler, CythonRegionProfiler])
+@pytest.mark.parametrize('profiler_cls', [RegionProfiler])
 def test_func_decorator(profiler_cls):
     """Test that decorator properly wraps a function and
     have a proper name.
@@ -82,7 +80,7 @@ def test_func_decorator(profiler_cls):
     assert set(ch['baz()'].children['foo()'].children.keys()) == {'inner'}
 
 
-@pytest.mark.parametrize('profiler_cls', [RegionProfiler, CythonRegionProfiler])
+@pytest.mark.parametrize('profiler_cls', [RegionProfiler])
 def test_func_automatic_naming(profiler_cls):
     """Test that decorated region name is correctly
     deduced from the code location.
@@ -106,7 +104,7 @@ def test_func_automatic_naming(profiler_cls):
     assert set(ch['baz()'].children['foo()'].children.keys()) == {'inner'}
 
 
-@pytest.mark.parametrize('profiler_cls', [RegionProfiler, CythonRegionProfiler])
+@pytest.mark.parametrize('profiler_cls', [RegionProfiler])
 def test_global_regions(profiler_cls):
     """Test that regions marked as global has root as a parent.
     """

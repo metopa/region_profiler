@@ -5,7 +5,7 @@ with open('README.rst') as f:
 
 setup_args = {
     'name': 'region_profiler',
-    'version': '0.9.2',
+    'version': '0.9.3',
     'description': 'Profile user-defined regions of code without any external tools',
     'long_description': long_description,
     'packages': ['region_profiler'],
@@ -16,15 +16,14 @@ setup_args = {
     'url': 'https://github.com/metopa/region_profiler',
     'author': 'Viacheslav Kroilov',
     'author_email': 'slavakroilov@gmail.com',
-    'setup_requires': ['pytest-runner', 'setuptools>=18.0', 'cython'],
-    'tests_require': ['cython', 'pytest<=4.0.2', 'pytest-cov==2.6.0', 'codecov'],
+    'setup_requires': ['pytest-runner', 'setuptools>=18.0'],
+    'tests_require': ['pytest<=4.0.2', 'pytest-cov==2.6.0', 'codecov'],
     'data_files': [('region_profiler', ['LICENSE.rst'])],
     'classifiers': [
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
-        'Programming Language :: Cython',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
@@ -34,16 +33,7 @@ setup_args = {
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Quality Assurance',
         'Topic :: Utilities'
-    ],
-    'ext_modules': [Extension('region_profiler.cython.listener', language='c++',
-                              sources=['region_profiler/cython/listener.pyx']),
-                    Extension('region_profiler.cython.node', language='c++',
-                              sources=['region_profiler/cython/node.pyx']),
-                    Extension('region_profiler.cython.profiler', language='c++',
-                              sources=['region_profiler/cython/profiler.pyx']),
-                    Extension('region_profiler.cython.utils', language='c++',
-                              sources=['region_profiler/cython/utils.pyx'])
-                    ],
+    ]
 }
 
 setup(**setup_args)

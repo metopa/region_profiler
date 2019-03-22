@@ -6,7 +6,6 @@ Dependencies
 ------------
 
 - Python >= 3.4
-- Cython
 
 
 Installation

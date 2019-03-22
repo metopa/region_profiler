@@ -4,12 +4,10 @@ from unittest import mock
 import pytest
 
 from region_profiler import RegionProfiler
-from region_profiler.cython.profiler import \
-    RegionProfiler as CythonRegionProfiler
 from region_profiler.debug_listener import DebugListener
 
 
-@pytest.mark.parametrize('profiler_cls', [RegionProfiler, CythonRegionProfiler])
+@pytest.mark.parametrize('profiler_cls', [RegionProfiler])
 def test_recursive_global_func_call(profiler_cls):
     """Test that global functions are registered correctly.
     """

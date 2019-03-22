@@ -2,12 +2,10 @@ import sys
 
 import pytest
 
-from region_profiler.cython.profiler import \
-    RegionProfiler as CythonRegionProfiler
 from region_profiler.profiler import RegionProfiler
 
 
-@pytest.mark.parametrize('profiler_cls', [RegionProfiler, CythonRegionProfiler])
+@pytest.mark.parametrize('profiler_cls', [RegionProfiler])
 @pytest.mark.parametrize('iter_cnt', [0, 1, 10])
 def test_iter_proxy_proper_values(profiler_cls, iter_cnt):
     """Test that iter_proxy properly forwards iterable values.
@@ -30,7 +28,7 @@ def raise_after_n(n, err):
     raise err
 
 
-@pytest.mark.parametrize('profiler_cls', [RegionProfiler, CythonRegionProfiler])
+@pytest.mark.parametrize('profiler_cls', [RegionProfiler])
 @pytest.mark.parametrize('iter_cnt', [0, 1, 10])
 def test_iter_proxy_custom_generator(profiler_cls, iter_cnt):
     """Test that iter_proxy properly forwards generator values.
@@ -48,7 +46,7 @@ def test_iter_proxy_custom_generator(profiler_cls, iter_cnt):
     assert n.recursion_depth == 0  # check that timing is stopped
 
 
-@pytest.mark.parametrize('profiler_cls', [RegionProfiler, CythonRegionProfiler])
+@pytest.mark.parametrize('profiler_cls', [RegionProfiler])
 @pytest.mark.parametrize('iter_cnt', [0, 1, 10])
 def test_iter_proxy_custom_exception(profiler_cls, iter_cnt):
     """Test that iter_proxy properly handles custom generator exceptions.

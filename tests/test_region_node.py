@@ -3,14 +3,11 @@ from unittest import mock
 
 import pytest
 
-from region_profiler.cython.node import RegionNode as CythonRegionNode
-from region_profiler.cython.node import RootNode as CythonRootNode
-from region_profiler.cython.utils import Timer as CythonTimer
 from region_profiler.node import RegionNode, RootNode
 from region_profiler.utils import SeqStats, Timer
 
 
-@pytest.mark.parametrize('node_cls', [RegionNode, CythonRegionNode])
+@pytest.mark.parametrize('node_cls', [RegionNode])
 def test_base_attributes(node_cls):
     """Assert that RegionNode exposes basic attributes.
     """
@@ -23,9 +20,7 @@ def test_base_attributes(node_cls):
 
 @pytest.mark.parametrize('node_cls,child_node_cls,timer_cls',
                          [(RegionNode, RegionNode, Timer),
-                          (RootNode, RegionNode, Timer),
-                          (CythonRegionNode, CythonRegionNode, CythonTimer),
-                          (CythonRootNode, CythonRegionNode, CythonTimer)])
+                          (RootNode, RegionNode, Timer)])
 def test_children(node_cls, child_node_cls, timer_cls):
     """Test that RegionNode properly creates its children upon request.
     """
@@ -50,8 +45,7 @@ def test_children(node_cls, child_node_cls, timer_cls):
 
 
 @pytest.mark.parametrize('node_cls,timer_cls',
-                         [(RegionNode, Timer),
-                          (CythonRegionNode, CythonTimer)])
+                         [(RegionNode, Timer)])
 def test_timing(node_cls, timer_cls):
     """Test that RegionNode correctly reacts on enter/exit events.
     """
@@ -68,8 +62,7 @@ def test_timing(node_cls, timer_cls):
 
 
 @pytest.mark.parametrize('node_cls,timer_cls',
-                         [(RegionNode, Timer),
-                          (CythonRegionNode, CythonTimer)])
+                         [(RegionNode, Timer)])
 def test_multiple_timing(node_cls, timer_cls):
     """Test that RegionNode correctly calculates multiple enter events.
     """
@@ -88,8 +81,7 @@ def test_multiple_timing(node_cls, timer_cls):
     assert n.stats == SeqStats(count=3, total=37, min=7, max=20)
 
 
-@pytest.mark.parametrize('node_cls',
-                         [RegionNode, CythonRegionNode])
+@pytest.mark.parametrize('node_cls', [RegionNode])
 def test_timing_with_real_clock(node_cls):
     """Test that RegionNode uses real clock by default.
     """
@@ -102,8 +94,7 @@ def test_timing_with_real_clock(node_cls):
     assert n.stats == SeqStats(count=1, total=dur, min=dur, max=dur)
 
 
-@pytest.mark.parametrize('node_cls',
-                         [RegionNode, CythonRegionNode])
+@pytest.mark.parametrize('node_cls', [RegionNode])
 def test_str_conversion(node_cls):
     """Test __str__ and __repr__ methods.
     """
@@ -112,9 +103,7 @@ def test_str_conversion(node_cls):
     assert isinstance(repr(n), str)
 
 
-@pytest.mark.parametrize('node_cls,timer_cls',
-                         [(RegionNode, Timer),
-                          (CythonRegionNode, CythonTimer)])
+@pytest.mark.parametrize('node_cls,timer_cls', [(RegionNode, Timer)])
 def test_cancellation(node_cls, timer_cls):
     """Test timing cancellation event.
     """
@@ -132,9 +121,8 @@ def test_cancellation(node_cls, timer_cls):
     n.cancel_region()
     assert n.stats == SeqStats(count=1, total=10, min=10, max=10)
 
-@pytest.mark.parametrize('node_cls,timer_cls',
-                         [(RootNode, Timer),
-                          (CythonRootNode, CythonTimer)])
+
+@pytest.mark.parametrize('node_cls,timer_cls', [(RootNode, Timer)])
 def test_root_stats(node_cls, timer_cls):
     """Test that RootNode has special handling for stats property.
     """
@@ -149,9 +137,7 @@ def test_root_stats(node_cls, timer_cls):
     assert n.stats.max == 6
 
 
-@pytest.mark.parametrize('node_cls,timer_cls',
-                         [(RootNode, Timer),
-                          (CythonRootNode, CythonTimer)])
+@pytest.mark.parametrize('node_cls,timer_cls', [(RootNode, Timer)])
 def test_root_cancellation(node_cls, timer_cls):
     """Test that RootNode raises a warning on cancellation event.
     """

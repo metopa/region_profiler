@@ -11,15 +11,14 @@ from region_profiler import RegionProfiler, func
 from region_profiler import install as install_profiler
 from region_profiler import iter_proxy, region
 from region_profiler import reporter_columns as cols
-from region_profiler.cython.profiler import \
-    RegionProfiler as CythonRegionProfiler
-from region_profiler.cython.utils import Timer as CythonTimer
 from region_profiler.reporters import SilentReporter
 from region_profiler.utils import Timer
 
 
 def get_timer_cls(use_cython):
-    return CythonTimer if use_cython else Timer
+    if use_cython:
+        raise RuntimeError("Cython support is dropped")
+    return Timer
 
 
 @contextlib.contextmanager
@@ -43,27 +42,13 @@ def test_reload_works(monkeypatch, multiple_runs):
     reporter = SilentReporter([cols.name])
     with fresh_region_profiler(monkeypatch):
         assert region_profiler.global_instance._profiler is None
-        install_profiler(reporter, use_cython=False)
+        install_profiler(reporter)
         assert isinstance(region_profiler.global_instance._profiler,
                           RegionProfiler)
     assert reporter.rows == [['name'], [RegionProfiler.ROOT_NODE_NAME]]
 
 
-@pytest.mark.parametrize('multiple_runs', [0, 1, 2])
-def test_cython_reload_works(monkeypatch, multiple_runs):
-    """Test that ``fresh_module`` fixture properly
-    resets ``region_profiler`` module with cython mode.
-    """
-    reporter = SilentReporter([cols.name])
-    with fresh_region_profiler(monkeypatch):
-        assert region_profiler.global_instance._profiler is None
-        install_profiler(reporter, use_cython=True)
-        assert isinstance(region_profiler.global_instance._profiler,
-                          CythonRegionProfiler)
-    assert reporter.rows == [['name'], [RegionProfiler.ROOT_NODE_NAME]]
-
-
-@pytest.mark.parametrize('use_cython', [False, True])
+@pytest.mark.parametrize('use_cython', [False])
 def test_with_fake_timer(monkeypatch, use_cython):
     """Integration test with a fake timer.
     """
@@ -82,7 +67,7 @@ def test_with_fake_timer(monkeypatch, use_cython):
                     pass
 
     with fresh_region_profiler(monkeypatch):
-        install_profiler(reporter=reporter, use_cython=use_cython,
+        install_profiler(reporter=reporter,
                          timer_cls=lambda: get_timer_cls(use_cython)(mock_clock))
         foo()
         with region('x'):
@@ -100,7 +85,7 @@ def test_with_fake_timer(monkeypatch, use_cython):
     assert reporter.rows == expected
 
 
-@pytest.mark.parametrize('use_cython', [False, True])
+@pytest.mark.parametrize('use_cython', [False])
 def test_with_global_regions(monkeypatch, use_cython):
     """Integration test with regions marked as globals.
     """
@@ -127,7 +112,7 @@ def test_with_global_regions(monkeypatch, use_cython):
             bar()
 
     with fresh_region_profiler(monkeypatch):
-        install_profiler(reporter=reporter, use_cython=use_cython,
+        install_profiler(reporter=reporter,
                          timer_cls=lambda: get_timer_cls(use_cython)(mock_clock))
         foo()
         with region('x'):
@@ -149,7 +134,7 @@ def test_with_global_regions(monkeypatch, use_cython):
     assert reporter.rows == expected
 
 
-@pytest.mark.parametrize('use_cython', [False, True])
+@pytest.mark.parametrize('use_cython', [False])
 def test_with_real_timer(monkeypatch, use_cython):
     """Integration test with a real timer.
     """
@@ -171,7 +156,7 @@ def test_with_real_timer(monkeypatch, use_cython):
                     time.sleep(i)
 
     with fresh_region_profiler(monkeypatch):
-        install_profiler(reporter, use_cython=use_cython)
+        install_profiler(reporter)
         foo()
         with region('x'):
             time.sleep(0.5)
@@ -200,7 +185,7 @@ def test_with_real_timer(monkeypatch, use_cython):
             assert e[2] * lower <= int(r[2]) <= e[2] * upper + upper_delta
 
 
-@pytest.mark.parametrize('use_cython', [False, True])
+@pytest.mark.parametrize('use_cython', [False])
 def test_automatic_naming(monkeypatch, use_cython):
     """Integration test with regions with automatic naming.
     """
@@ -215,14 +200,14 @@ def test_automatic_naming(monkeypatch, use_cython):
                 pass
 
     with fresh_region_profiler(monkeypatch):
-        install_profiler(reporter=reporter, use_cython=use_cython,
+        install_profiler(reporter=reporter,
                          timer_cls=lambda: get_timer_cls(use_cython)(mock_clock))
         foo()
 
     expected = [['name'],
                 [RegionProfiler.ROOT_NODE_NAME],
                 ['foo()'],
-                ['foo() <test_module.py:213>'],
-                ['foo() <test_module.py:214>']]
+                ['foo() <test_module.py:198>'],
+                ['foo() <test_module.py:199>']]
 
     assert reporter.rows == expected
