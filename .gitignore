@@ -56,5 +56,5 @@ docs/_build/
 
 # PyBuilder
 target/
-region_profiler/cython/*.cpp
-region_profiler/cython/*.html
+region_profiler/cython.deprecated/*.cpp
+region_profiler/cython.deprecated/*.html
