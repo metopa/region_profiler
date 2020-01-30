@@ -6,6 +6,7 @@ from region_profiler.debug_listener import DebugListener
 from region_profiler.profiler import RegionProfiler
 from region_profiler.reporters import ConsoleReporter
 from region_profiler.utils import NullContext
+import functools
 
 _profiler = None
 """Global :py:class:`RegionProfiler` instance.
@@ -109,6 +110,7 @@ def func(name=None, asglobal=False):
 
         name += '()'
 
+        @functools.wraps(fn)
         def wrapped(*args, **kwargs):
             with region(name, asglobal=asglobal):
                 return fn(*args, **kwargs)
