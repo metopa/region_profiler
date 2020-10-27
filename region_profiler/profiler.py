@@ -77,6 +77,15 @@ class RegionProfiler:
         self._exit_current_region()
         self.node_stack.pop()
 
+    def _torch_synchronize(self):
+        try:
+            import torch
+
+            torch.cuda.synchronize()
+        except Exception as e:
+            print(f"Warning: could not synchronize Torch CUDA: {e}")
+            pass
+
     def func(self, name=None, asglobal=False):
         """Decorator for entering region on a function call.
 
@@ -171,11 +180,13 @@ class RegionProfiler:
             l.finalize()
 
     def _enter_current_region(self):
+        self._torch_synchronize()
         self.current_node.enter_region()
         for l in self.listeners:
             l.region_entered(self, self.current_node)
 
     def _exit_current_region(self):
+        self._torch_synchronize()
         self.current_node.exit_region()
         for l in self.listeners:
             l.region_exited(self, self.current_node)
