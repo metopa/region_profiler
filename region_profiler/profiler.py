@@ -1,5 +1,7 @@
 from contextlib import contextmanager
 
+import torch.autograd.profiler as torch_profiler
+
 from region_profiler.node import RootNode
 from region_profiler.utils import Timer, get_name_by_callsite
 
@@ -23,7 +25,7 @@ class RegionProfiler:
     and :py:func:`region_profiler.iter_proxy`.
     """
 
-    ROOT_NODE_NAME = '<main>'
+    ROOT_NODE_NAME = "<main>"
 
     def __init__(self, timer_cls=None, listeners=None):
         """Construct new :py:class:`RegionProfiler`.
@@ -73,7 +75,8 @@ class RegionProfiler:
         parent = self.root if asglobal else self.current_node
         self.node_stack.append(parent.get_child(name))
         self._enter_current_region()
-        yield self.current_node
+        with torch_profiler.record_function(f"region_profiler::{name}"):
+            yield self.current_node
         self._exit_current_region()
         self.node_stack.pop()
 
@@ -110,7 +113,7 @@ class RegionProfiler:
             if name is None:
                 name = fn.__name__
 
-            name += '()'
+            name += "()"
 
             def wrapped(*args, **kwargs):
                 with self.region(name, asglobal):
