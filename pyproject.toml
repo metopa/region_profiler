@@ -1,0 +1,17 @@
+[tool]
+[tool.poetry]
+name = "region_profiler"
+version = "0.9.3"
+description = "Profile user-defined regions of code without any external tools"
+license = "MIT"
+keywords = ["timing", "timer", "profiling", "profiler"]
+classifiers = ["Development Status :: 4 - Beta", "Intended Audience :: Developers", "License :: OSI Approved :: MIT License", "Operating System :: OS Independent", "Programming Language :: Python", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.4", "Programming Language :: Python :: 3.5", "Programming Language :: Python :: 3.6", "Programming Language :: Python :: 3.7", "Topic :: Software Development :: Libraries :: Python Modules", "Topic :: Software Development :: Quality Assurance", "Topic :: Utilities"]
+homepage = "https://github.com/metopa/region_profiler"
+authors = ["Viacheslav Kroilov <slavakroilov@gmail.com>"]
+readme = "README.rst"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+mypy = "^0.800"

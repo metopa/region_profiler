@@ -1,9 +1,13 @@
 from contextlib import contextmanager
+from typing import Any, Callable, Generator, Iterable, List, Optional, TypeVar, cast
 
 import torch.autograd.profiler as torch_profiler
 
-from region_profiler.node import RootNode
+from region_profiler.listener import RegionProfilerListener
+from region_profiler.node import RegionNode, RootNode
 from region_profiler.utils import Timer, get_name_by_callsite
+
+F = TypeVar("F", bound=Callable[..., Any])
 
 
 class RegionProfiler:
@@ -27,7 +31,9 @@ class RegionProfiler:
 
     ROOT_NODE_NAME = "<main>"
 
-    def __init__(self, timer_cls=None, listeners=None):
+    def __init__(
+        self, timer_cls=None, listeners: Optional[List[RegionProfilerListener]] = None
+    ):
         """Construct new :py:class:`RegionProfiler`.
 
         Args:
@@ -40,13 +46,18 @@ class RegionProfiler:
         if timer_cls is None:
             timer_cls = Timer
         self.root = RootNode(name=self.ROOT_NODE_NAME, timer_cls=timer_cls)
-        self.node_stack = [self.root]
-        self.listeners = listeners or []
+        self.node_stack: List[RegionNode] = [self.root]
+        self.listeners: List[RegionProfilerListener] = listeners or []
         for l in self.listeners:
             l.region_entered(self, self.root)
 
     @contextmanager
-    def region(self, name=None, asglobal=False, indirect_call_depth=0):
+    def region(
+        self,
+        name: Optional[str] = None,
+        asglobal: bool = False,
+        indirect_call_depth: int = 0,
+    ) -> Generator[RegionNode, None, None]:
         """Start new region in the current context.
 
         This function implements context manager interface.
@@ -89,7 +100,9 @@ class RegionProfiler:
             print(f"Warning: could not synchronize Torch CUDA: {e}")
             pass
 
-    def func(self, name=None, asglobal=False):
+    def func(
+        self, name: Optional[str] = None, asglobal: bool = False
+    ) -> Callable[[F], F]:
         """Decorator for entering region on a function call.
 
         Examples::
@@ -108,7 +121,7 @@ class RegionProfiler:
             Callable: a decorator for wrapping a function
         """
 
-        def decorator(fn):
+        def decorator(fn: F) -> F:
             nonlocal name
             if name is None:
                 name = fn.__name__
@@ -119,11 +132,17 @@ class RegionProfiler:
                 with self.region(name, asglobal):
                     return fn(*args, **kwargs)
 
-            return wrapped
+            return cast(F, wrapped)
 
         return decorator
 
-    def iter_proxy(self, iterable, name=None, asglobal=False, indirect_call_depth=0):
+    def iter_proxy(
+        self,
+        iterable: Iterable,
+        name: Optional[str] = None,
+        asglobal: bool = False,
+        indirect_call_depth: int = 0,
+    ) -> Iterable:
         """Wraps an iterable and profiles :func:`next()` calls on this iterable.
 
         This proxy may be useful, when the iterable is some data loader,
@@ -200,7 +219,7 @@ class RegionProfiler:
             l.region_canceled(self, self.current_node)
 
     @property
-    def current_node(self):
+    def current_node(self) -> RegionNode:
         """Return current region node.
 
         Returns:

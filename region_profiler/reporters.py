@@ -1,6 +1,11 @@
+from __future__ import annotations
+
 import sys
+from typing import List, Optional
 
 from region_profiler import reporter_columns as cols
+from region_profiler.node import RegionNode
+from region_profiler.profile import RegionProfiler
 
 
 class Slice:
@@ -29,8 +34,18 @@ class Slice:
         max_time(float): maximal duration, spent in the corresponding region
     """
 
-    def __init__(self, id, name, parent, call_depth, count,
-                 total_time, total_inner_time, min_time, max_time):
+    def __init__(
+        self,
+        id: int,
+        name: str,
+        parent: Optional[Slice],
+        call_depth: int,
+        count: int,
+        total_time: float,
+        total_inner_time: float,
+        min_time: float,
+        max_time: float,
+    ):
         """
         Args:
             id(int): unique slice id
@@ -56,29 +71,54 @@ class Slice:
         self.max_time = max_time
 
     @property
-    def parent_name(self):
-        """Convenience method for retrieving parent node name.
-        """
-        return self.parent.name if self.parent else ''
+    def parent_name(self) -> str:
+        """Convenience method for retrieving parent node name."""
+        return self.parent.name if self.parent else ""
 
     def __str__(self):
-        return 'Slice({})'.format(', '.join(
-            '{}={}'.format(k, getattr(self, k)) for k in
-            ('id', 'name', 'parent_name', 'call_depth',
-             'count', 'total_time', 'total_inner_time',
-             'min_time', 'max_time')
-        ))
+        return "Slice({})".format(
+            ", ".join(
+                "{}={}".format(k, getattr(self, k))
+                for k in (
+                    "id",
+                    "name",
+                    "parent_name",
+                    "call_depth",
+                    "count",
+                    "total_time",
+                    "total_inner_time",
+                    "min_time",
+                    "max_time",
+                )
+            )
+        )
 
     def __repr__(self):
         return str(self)
 
     def __eq__(self, other):
-        return all(getattr(self, n) == getattr(other, n) for n in
-                   ('id', 'name', 'parent_name', 'call_depth', 'count',
-                    'total_time', 'total_inner_time', 'min_time', 'max_time'))
+        return all(
+            getattr(self, n) == getattr(other, n)
+            for n in (
+                "id",
+                "name",
+                "parent_name",
+                "call_depth",
+                "count",
+                "total_time",
+                "total_inner_time",
+                "min_time",
+                "max_time",
+            )
+        )
 
 
-def get_node_slice(slices, node, parent_slice, call_depth):
+def get_node_slice(
+    slices: List[Slice],
+    node: RegionNode,
+    parent_slice: Optional[Slice],
+    call_depth: int,
+):
     """Serialize a node and its descendants data in a list of :py:class:`Slice`.
 
     Descendants are serialized sorted by their total time in decreasing order.
@@ -89,11 +129,20 @@ def get_node_slice(slices, node, parent_slice, call_depth):
         parent_slice (:py:class:`Slice`, optional): link to a slice of the parent node
         call_depth (int): depth of the node in the hierarchy
     """
-    s = Slice(len(slices), node.name, parent_slice, call_depth, node.stats.count,
-              node.stats.total, 0, node.stats.min, node.stats.max)
+    s = Slice(
+        len(slices),
+        node.name,
+        parent_slice,
+        call_depth,
+        node.stats.count,
+        node.stats.total,
+        0,
+        node.stats.min,
+        node.stats.max,
+    )
     slices.append(s)
 
-    child_total = 0
+    child_total = 0.0
 
     for ch in sorted(node.children.values(), key=lambda n: -n.stats.total):
         get_node_slice(slices, ch, s, call_depth + 1)
@@ -102,7 +151,7 @@ def get_node_slice(slices, node, parent_slice, call_depth):
     s.total_inner_time = max(s.total_time - child_total, 0)
 
 
-def get_profiler_slice(rp):
+def get_profiler_slice(rp: RegionProfiler) -> List[Slice]:
     """Serialize a profiler state in a list of :py:class:`Slice`.
 
     Descendants are serialized sorted by their total time in decreasing order.
@@ -113,14 +162,20 @@ def get_profiler_slice(rp):
     Returns:
         list of :py:class:`Slice`: serialized nodes of the profiler
     """
-    slices = []
+    slices: List[Slice] = []
     get_node_slice(slices, rp.root, None, 0)
     return slices
 
 
-DEFAULT_CONSOLE_COLUMNS = (cols.indented_name, cols.total,
-                           cols.percents_of_total, cols.count,
-                           cols.min, cols.average, cols.max)
+DEFAULT_CONSOLE_COLUMNS = (
+    cols.indented_name,
+    cols.total,
+    cols.percents_of_total,
+    cols.count,
+    cols.min,
+    cols.average,
+    cols.max,
+)
 """Default column list for :py:class:`ConsoleReporter`.
 """
 
@@ -183,17 +238,29 @@ class ConsoleReporter:
             rows.append(row)
             for i, c in enumerate(row):
                 col_width[i] = max(col_width[i], len(c))
-        rows.insert(1, ['-' * w for w in col_width])
-        delim = '  '
-        format = delim.join('{:' + ('<' if i == 0 else '>') + str(w) + '}' for i, w in enumerate(col_width))
+        rows.insert(1, ["-" * w for w in col_width])
+        delim = "  "
+        format = delim.join(
+            "{:" + ("<" if i == 0 else ">") + str(w) + "}"
+            for i, w in enumerate(col_width)
+        )
         sys.stdout.flush()
         for r in rows:
             print(format.format(*r), file=self.stream)
 
 
-DEFAULT_CSV_COLUMNS = (cols.node_id, cols.name, cols.parent_id, cols.parent_name,
-                       cols.total_us, cols.total_inner_us,
-                       cols.count, cols.min_us, cols.average_us, cols.max_us)
+DEFAULT_CSV_COLUMNS = (
+    cols.node_id,
+    cols.name,
+    cols.parent_id,
+    cols.parent_name,
+    cols.total_us,
+    cols.total_inner_us,
+    cols.count,
+    cols.min_us,
+    cols.average_us,
+    cols.max_us,
+)
 """Default column list for :py:class:`CsvReporter`.
 """
 
@@ -258,7 +325,7 @@ class CsvReporter:
             rows.append(row)
 
         for r in rows:
-            print(', '.join(r), file=self.stream)
+            print(", ".join(r), file=self.stream)
 
 
 class SilentReporter:

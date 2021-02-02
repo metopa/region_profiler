@@ -1,0 +1,28 @@
+
+* Changes
+
+- Add torch.cuda.synchronize() around regions
+- Annotate regions for the torch autograd profiler: this works well with [[https://github.com/indigoviolet/torchprof][torchprof]]
+
+
+* TODO
+
+- [ ] add type hints and make it PEP-561 compliant (py.typed)
+
+
+* Notes
+
+** Synchronization, multiprocessing, dataset
+
+Seems like adding @rp.func() to ~__getitem__~ on a dataset that uses
+multiprocessing will lead to some warnings about not being able to synchronize
+in a forked multiprocessing process.
+
+They recommend changing the multiprocessing start method, but this makes things slower
+
+#+BEGIN_SRC python
+import multiprocessing
+multiprocessing.set_start_method('forkserver', force=True) # or 'spawn'
+#+END_SRC
+
+Is it possible to not synchronize here and still get correct results somehow?

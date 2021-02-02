@@ -2,9 +2,22 @@ import inspect
 import os
 import time
 from collections import namedtuple
+from typing import Any, Callable, Protocol, TypeVar
+
+F = TypeVar("F", bound=Callable[..., Any])
 
 
-class SeqStats:
+class SeqStatsProtocol(Protocol):
+    count: int
+    total: float
+    min: float
+    max: float
+
+    def add(self, x: float):
+        ...
+
+
+class SeqStats(SeqStatsProtocol):
     """Helper class for calculating online stats of a number sequence.
 
     :py:class:`SeqStats` records the following parameters of a number sequence:
@@ -18,13 +31,15 @@ class SeqStats:
     statistics are calculated online.
     """
 
-    def __init__(self, count=0, total=0, min=0, max=0):
+    def __init__(
+        self, count: int = 0, total: float = 0, min: float = 0, max: float = 0
+    ):
         self.count = count
         self.total = total
         self.min = min
         self.max = max
 
-    def add(self, x):
+    def add(self, x: float):
         """Update statistics with the next value of a sequence.
 
         Args:
@@ -37,24 +52,29 @@ class SeqStats:
 
     @property
     def avg(self):
-        """Calculate sequence average.
-        """
+        """Calculate sequence average."""
         return 0 if self.count == 0 else self.total / self.count
 
     def __str__(self):
-        return 'SeqStats{{{}..{}..{}/{}}}'.format(self.min, self.avg,
-                                                  self.max, self.count)
+        return "SeqStats{{{}..{}..{}/{}}}".format(
+            self.min, self.avg, self.max, self.count
+        )
 
     def __repr__(self):
-        return ('SeqStats(count={}, total={}, min={}, max={})'
-                .format(self.count, self.total, self.min, self.max))
+        return "SeqStats(count={}, total={}, min={}, max={})".format(
+            self.count, self.total, self.min, self.max
+        )
 
     def __eq__(self, other):
-        return (self.total == other.total and self.count == other.count and
-                self.min == other.min and self.max == other.max)
+        return (
+            self.total == other.total
+            and self.count == other.count
+            and self.min == other.min
+            and self.max == other.max
+        )
 
 
-def default_clock():
+def default_clock() -> float:
     """Default clock provider for Timer class.
 
     Returns:
@@ -75,19 +95,19 @@ class Timer:
     :py:meth:`current_elapsed` or :py:meth:`total_elapsed()`.
     """
 
-    def __init__(self, clock=default_clock):
+    def __init__(self, clock: Callable[[], float] = default_clock):
         """
         Args:
             clock(function): functor, that returns current clock.
                       Measurements have the same precision as the clock
         """
         self.clock = clock
-        self._begin_ts = 0
-        self._end_ts = 0
+        self._begin_ts = 0.0
+        self._end_ts = 0.0
         self._running = False
-        self.last_event_time = 0
+        self.last_event_time = 0.0
 
-    def begin_ts(self):
+    def begin_ts(self) -> float:
         """Start event timestamp.
 
         Returns:
@@ -95,7 +115,7 @@ class Timer:
         """
         return self._begin_ts
 
-    def end_ts(self):
+    def end_ts(self) -> float:
         """Stop event timestamp.
 
         Returns:
@@ -124,11 +144,10 @@ class Timer:
             self._running = False
 
     def mark_aux_event(self):
-        """Update ``last_event_time``.
-        """
+        """Update ``last_event_time``."""
         self.last_event_time = self.clock()
 
-    def is_running(self):
+    def is_running(self) -> bool:
         """Check if timer is currently running.
 
         Returns:
@@ -136,7 +155,7 @@ class Timer:
         """
         return self._running
 
-    def elapsed(self):
+    def elapsed(self) -> float:
         """Return duration between `start` and `stop` events.
 
         If timer is running (no :py:meth:`stop` has been called
@@ -147,18 +166,21 @@ class Timer:
         """
         return (self._end_ts - self._begin_ts) if not self._running else 0
 
-    def current_elapsed(self):
+    def current_elapsed(self) -> float:
         """Return duration between `start` and `stop` events or
         duration from last `start` event if no pairing `stop` event occurred.
 
         Returns:
             int or float: duration
         """
-        return (self._end_ts - self._begin_ts) if not self._running \
+        return (
+            (self._end_ts - self._begin_ts)
+            if not self._running
             else (self.clock() - self._begin_ts)
+        )
 
 
-CallerInfo = namedtuple('CallerInfo', ['file', 'line', 'name'])
+CallerInfo = namedtuple("CallerInfo", ["file", "line", "name"])
 
 
 def get_caller_info(stack_depth=1):
@@ -201,12 +223,11 @@ def get_name_by_callsite(stack_depth=1):
     """
     info = get_caller_info(stack_depth + 1)
     f = os.path.basename(info.file)
-    return '{}() <{}:{}>'.format(info.name, f, info.line)
+    return "{}() <{}:{}>".format(info.name, f, info.line)
 
 
 class NullContext:
-    """Empty context manager.
-    """
+    """Empty context manager."""
 
     def __enter__(self):
         pass
@@ -215,9 +236,8 @@ class NullContext:
         pass
 
 
-def null_decorator():
-    """Empty decorator.
-    """
+def null_decorator() -> Callable[[F], F]:
+    """Empty decorator."""
     return lambda fn: fn
 
 
@@ -236,15 +256,15 @@ def pretty_print_time(sec):
     Returns:
         str: human-readable string representation as shown above.
     """
-    for unit in ('s', 'ms', 'us'):
+    for unit in ("s", "ms", "us"):
         if sec >= 500:
-            return '{:.0f} {}'.format(sec, unit)
+            return "{:.0f} {}".format(sec, unit)
         if sec >= 100:
-            return '{:.1f} {}'.format(sec, unit)
+            return "{:.1f} {}".format(sec, unit)
         if sec >= 10:
-            return '{:.2f} {}'.format(sec, unit)
+            return "{:.2f} {}".format(sec, unit)
         if sec >= 1:
-            return '{:.3f} {}'.format(sec, unit)
+            return "{:.3f} {}".format(sec, unit)
         sec *= 1000
 
-    return '{} ns'.format(int(sec))
+    return "{} ns".format(int(sec))

@@ -1,11 +1,13 @@
 import atexit
 import warnings
+from typing import Any, Callable, Iterable, List, Optional, Type, TypeVar
 
 from region_profiler.chrome_trace_listener import ChromeTraceListener
 from region_profiler.debug_listener import DebugListener
+from region_profiler.listener import RegionProfilerListener
 from region_profiler.profiler import RegionProfiler
 from region_profiler.reporters import ConsoleReporter
-from region_profiler.utils import NullContext
+from region_profiler.utils import NullContext, Timer, null_decorator
 
 _profiler = None
 """Global :py:class:`RegionProfiler` instance.
@@ -13,9 +15,15 @@ _profiler = None
 This singleton is initialized using :py:func:`install`.
 """
 
+F = TypeVar("F", bound=Callable[..., Any])
 
-def install(reporter=ConsoleReporter(), chrome_trace_file=None,
-            debug_mode=False, timer_cls=None):
+
+def install(
+    reporter=ConsoleReporter(),
+    chrome_trace_file: Optional[str] = None,
+    debug_mode: bool = False,
+    timer_cls: Optional[Callable[[], Timer]] = None,
+) -> RegionProfiler:
     """Enable profiling.
 
     Initialize a global profiler with user arguments
@@ -39,7 +47,7 @@ def install(reporter=ConsoleReporter(), chrome_trace_file=None,
     """
     global _profiler
     if _profiler is None:
-        listeners = []
+        listeners: List[RegionProfilerListener] = []
         if chrome_trace_file:
             listeners.append(ChromeTraceListener(chrome_trace_file))
         if debug_mode:
@@ -49,13 +57,15 @@ def install(reporter=ConsoleReporter(), chrome_trace_file=None,
 
         _profiler.root.enter_region()
         atexit.register(lambda: reporter.dump_profiler(_profiler))
-        atexit.register(lambda: _profiler.finalize())
+        atexit.register(lambda: _profiler.finalize())  # type: ignore[union-attr]
     else:
-        warnings.warn("region_profiler.install() must be called only once", stacklevel=2)
+        warnings.warn(
+            "region_profiler.install() must be called only once", stacklevel=2
+        )
     return _profiler
 
 
-def region(name=None, asglobal=False):
+def region(name: Optional[str] = None, asglobal: bool = False):
     """Start new region in the current context.
 
     This function implements context manager interface.
@@ -83,8 +93,8 @@ def region(name=None, asglobal=False):
         return NullContext()
 
 
-def func(name=None, asglobal=False):
-    """Decorator for entering region on a function call.
+def func(name: Optional[str] = None, asglobal: bool = False) -> Callable[[F], F]:
+    """Decorator (factory) for entering region on a function call.
 
     Examples::
 
@@ -102,23 +112,30 @@ def func(name=None, asglobal=False):
         Callable: a decorator for wrapping a function
     """
 
-    def decorator(fn):
-        nonlocal name
-        if name is None:
-            name = fn.__name__
+    if _profiler is not None:
+        return _profiler.func(name=name, asglobal=asglobal)
+    else:
+        return null_decorator()
 
-        name += '()'
+    # def decorator(fn):
+    #     nonlocal name
+    #     if name is None:
+    #         name = fn.__name__
 
-        def wrapped(*args, **kwargs):
-            with region(name, asglobal=asglobal):
-                return fn(*args, **kwargs)
+    #     name += "()"
 
-        return wrapped
+    #     def wrapped(*args, **kwargs):
+    #         with region(name, asglobal=asglobal):
+    #             return fn(*args, **kwargs)
 
-    return decorator
+    #     return wrapped
+
+    # return decorator
 
 
-def iter_proxy(iterable, name=None, asglobal=False):
+def iter_proxy(
+    iterable: Iterable, name: Optional[str] = None, asglobal: bool = False
+) -> Iterable:
     """Wraps an iterable and profiles :func:`next()` calls on this iterable.
 
     This proxy may be useful, when the iterable is some data loader,

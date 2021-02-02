@@ -1,6 +1,9 @@
-import warnings
+from __future__ import annotations
 
-from region_profiler.utils import SeqStats, Timer
+import warnings
+from typing import Callable, Dict
+
+from region_profiler.utils import SeqStats, SeqStatsProtocol, Timer
 
 
 class RegionNode:
@@ -20,7 +23,7 @@ class RegionNode:
         stats (SeqStats): Measurement statistics.
     """
 
-    def __init__(self, name, timer_cls=Timer):
+    def __init__(self, name: str, timer_cls: Callable[[], Timer] = Timer):
         """Create new instance of ``RegionNode`` with the given name.
 
         Args:
@@ -33,14 +36,13 @@ class RegionNode:
         self.timer_cls = timer_cls
         self.timer = self.timer_cls()
         self.cancelled = False
-        self.stats = SeqStats()
-        self.children = dict()
+        self.stats: SeqStatsProtocol = SeqStats()
+        self.children: Dict[str, RegionNode] = dict()
         self.recursion_depth = 0
         self.last_event_time = 0
 
     def enter_region(self):
-        """Start timing current region.
-        """
+        """Start timing current region."""
         if self.recursion_depth == 0:
             self.timer.start()
         else:
@@ -62,8 +64,7 @@ class RegionNode:
             self.timer.mark_aux_event()
 
     def exit_region(self):
-        """Stop current timing and update stats with the current measurement.
-        """
+        """Stop current timing and update stats with the current measurement."""
         if self.cancelled:
             self.cancelled = False
             self.timer.mark_aux_event()
@@ -75,7 +76,7 @@ class RegionNode:
             else:
                 self.timer.mark_aux_event()
 
-    def get_child(self, name, timer_cls=None):
+    def get_child(self, name: str, timer_cls=None) -> RegionNode:
         """Get node child with the given name.
 
         This method creates a new child and stores it
@@ -96,19 +97,19 @@ class RegionNode:
             return c
 
     def timer_is_active(self):
-        """Return True if timer is currently running.
-        """
+        """Return True if timer is currently running."""
         return self.recursion_depth > 1 or self.recursion_depth == 1 and self.cancelled
 
     def __str__(self):
-        return self.name or '???'
+        return self.name or "???"
 
     def __repr__(self):
-        return 'RegionNode(name="{}", stats={}, timer_cls={})'. \
-            format(str(self), repr(self.stats), self.timer_cls)
+        return 'RegionNode(name="{}", stats={}, timer_cls={})'.format(
+            str(self), repr(self.stats), self.timer_cls
+        )
 
 
-class _RootNodeStats:
+class _RootNodeStats(SeqStatsProtocol):
     """Proxy object that wraps timer in the
     :py:class:`region_profiler.utils.SeqStats` interface.
 
@@ -117,24 +118,27 @@ class _RootNodeStats:
     Proxy properties return current timer values.
     """
 
-    def __init__(self, timer):
+    def __init__(self, timer: Timer):
         self.timer = timer
 
     @property
-    def count(self):
+    def count(self) -> int:  # type: ignore[override]
         return 1
 
     @property
-    def total(self):
+    def total(self) -> float:  # type: ignore[override]
         return self.timer.current_elapsed()
 
     @property
-    def min(self):
+    def min(self) -> float:  # type: ignore[override]
         return self.total
 
     @property
-    def max(self):
+    def max(self) -> float:  # type: ignore[override]
         return self.total
+
+    def add(self, x: float):
+        raise NotImplementedError
 
 
 class RootNode(RegionNode):
@@ -147,15 +151,14 @@ class RootNode(RegionNode):
     the real stats of previous measurements.
     """
 
-    def __init__(self, name='<root>', timer_cls=Timer):
+    def __init__(self, name: str = "<root>", timer_cls=Timer):
         super(RootNode, self).__init__(name, timer_cls)
         self.enter_region()
         self.stats = _RootNodeStats(self.timer)
 
     def cancel_region(self):
-        """Prevents root region from being cancelled.
-        """
-        warnings.warn('Can\'t cancel root region timer', stacklevel=2)
+        """Prevents root region from being cancelled."""
+        warnings.warn("Can't cancel root region timer", stacklevel=2)
 
     def exit_region(self):
         """Instead of :py:meth:`RegionNode.exit_region` it does not reset
