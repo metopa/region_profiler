@@ -5,7 +5,7 @@ from typing import List, Optional
 
 from region_profiler import reporter_columns as cols
 from region_profiler.node import RegionNode
-from region_profiler.profile import RegionProfiler
+from region_profiler.profiler import RegionProfiler
 
 
 class Slice:

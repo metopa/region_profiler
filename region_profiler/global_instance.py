@@ -65,6 +65,11 @@ def install(
     return _profiler
 
 
+def uninstall():
+    global _profiler
+    _profiler = None
+
+
 def region(name: Optional[str] = None, asglobal: bool = False):
     """Start new region in the current context.
 
@@ -112,25 +117,24 @@ def func(name: Optional[str] = None, asglobal: bool = False) -> Callable[[F], F]
         Callable: a decorator for wrapping a function
     """
 
-    if _profiler is not None:
-        return _profiler.func(name=name, asglobal=asglobal)
-    else:
-        return null_decorator()
+    # We can't just use _profiler?.func() here because this function, as well as
+    # decorator() will execute on import, before rp.install() can be called. So
+    # we can't be conditional on _profiler until we're inside wrapped(), and
+    # region() already does that.
+    def decorator(fn):
+        nonlocal name
+        if name is None:
+            name = fn.__name__
 
-    # def decorator(fn):
-    #     nonlocal name
-    #     if name is None:
-    #         name = fn.__name__
+        name += "()"
 
-    #     name += "()"
+        def wrapped(*args, **kwargs):
+            with region(name, asglobal=asglobal):
+                return fn(*args, **kwargs)
 
-    #     def wrapped(*args, **kwargs):
-    #         with region(name, asglobal=asglobal):
-    #             return fn(*args, **kwargs)
+        return wrapped
 
-    #     return wrapped
-
-    # return decorator
+    return decorator
 
 
 def iter_proxy(
