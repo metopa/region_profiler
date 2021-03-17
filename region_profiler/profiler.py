@@ -32,7 +32,10 @@ class RegionProfiler:
     ROOT_NODE_NAME = "<main>"
 
     def __init__(
-        self, timer_cls=None, listeners: Optional[List[RegionProfilerListener]] = None
+        self,
+        timer_cls=None,
+        listeners: Optional[List[RegionProfilerListener]] = None,
+        torch_synchronize: bool = True,
     ):
         """Construct new :py:class:`RegionProfiler`.
 
@@ -48,6 +51,7 @@ class RegionProfiler:
         self.root = RootNode(name=self.ROOT_NODE_NAME, timer_cls=timer_cls)
         self.node_stack: List[RegionNode] = [self.root]
         self.listeners: List[RegionProfilerListener] = listeners or []
+        self.torch_synchronize = torch_synchronize
         for l in self.listeners:
             l.region_entered(self, self.root)
 
@@ -92,6 +96,9 @@ class RegionProfiler:
         self.node_stack.pop()
 
     def _torch_synchronize(self):
+        if not self.torch_synchronize:
+            return
+
         try:
             import torch
 

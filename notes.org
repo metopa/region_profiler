@@ -1,7 +1,7 @@
 
 * Changes
 
-- Add torch.cuda.synchronize() around regions
+- Add torch.cuda.synchronize() around regions ([Mar 17 2021]: made configurable)
 - Annotate regions for the torch autograd profiler: this works well with [[https://github.com/indigoviolet/torchprof][torchprof]]
 - Added MemoryClock() to measure memory usage
 

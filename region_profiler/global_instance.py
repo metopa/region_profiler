@@ -1,13 +1,13 @@
 import atexit
 import warnings
-from typing import Any, Callable, Iterable, List, Optional, Type, TypeVar
+from typing import Any, Callable, Iterable, List, Optional, TypeVar
 
 from region_profiler.chrome_trace_listener import ChromeTraceListener
 from region_profiler.debug_listener import DebugListener
 from region_profiler.listener import RegionProfilerListener
 from region_profiler.profiler import RegionProfiler
 from region_profiler.reporters import ConsoleReporter
-from region_profiler.utils import NullContext, Timer, null_decorator
+from region_profiler.utils import NullContext, Timer
 
 _profiler = None
 """Global :py:class:`RegionProfiler` instance.
@@ -23,6 +23,7 @@ def install(
     chrome_trace_file: Optional[str] = None,
     debug_mode: bool = False,
     timer_cls: Optional[Callable[[], Timer]] = None,
+    torch_synchronize: bool = True,
 ) -> RegionProfiler:
     """Enable profiling.
 
@@ -53,7 +54,11 @@ def install(
         if debug_mode:
             listeners.append(DebugListener())
 
-        _profiler = RegionProfiler(listeners=listeners, timer_cls=timer_cls)
+        _profiler = RegionProfiler(
+            listeners=listeners,
+            timer_cls=timer_cls,
+            torch_synchronize=torch_synchronize,
+        )
 
         _profiler.root.enter_region()
         atexit.register(lambda: reporter.dump_profiler(_profiler))
