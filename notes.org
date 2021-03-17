@@ -3,12 +3,22 @@
 
 - Add torch.cuda.synchronize() around regions
 - Annotate regions for the torch autograd profiler: this works well with [[https://github.com/indigoviolet/torchprof][torchprof]]
+- Added MemoryClock() to measure memory usage
 
 
 * TODO
 
-- [X] add type hints and make it PEP-561 compliant (py.typed)
-- Get rid of actual profiler stuff and merge into torchprof
+1. [X] add type hints and make it PEP-561 compliant (py.typed)
+2. Get rid of actual profiler stuff and merge into torchprof
+
+   ^ wait: region_profiler might actually be useful for memory profiling
+
+   Also note: torch profiler already has tensor-specific memory profiling, so
+   this would add global memory profiling
+
+3. Get memory usage to be printed as ~MB~ etc  instead of as ~s~
+4. Choose root node instead of using the node from \.install()
+5. don't use =atexit=, instead use a context manager (same as 4.)
 
 
 * Notes

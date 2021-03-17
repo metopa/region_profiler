@@ -15,3 +15,5 @@
 
 from region_profiler.global_instance import func, install, iter_proxy, region, uninstall
 from region_profiler.profiler import RegionProfiler
+from region_profiler.reporters import ConsoleReporter
+from region_profiler.utils import MemoryClock

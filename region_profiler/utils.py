@@ -1,8 +1,12 @@
+from __future__ import annotations
+
 import inspect
 import os
 import time
 from collections import namedtuple
-from typing import Any, Callable, Protocol, TypeVar
+from typing import Any, Callable, Protocol, TypeVar, cast
+
+import psutil
 
 F = TypeVar("F", bound=Callable[..., Any])
 
@@ -81,6 +85,18 @@ def default_clock() -> float:
         float: value (in fractional seconds) of a performance counter
     """
     return time.perf_counter()
+
+
+class MemoryClock:
+    def __init__(self):
+        self.proc = psutil.Process(os.getpid())
+
+    def __call__(self) -> float:
+        return cast(float, self.proc.memory_info().rss)
+
+    @classmethod
+    def timer_cls(cls) -> Timer:
+        return Timer(clock=cls())
 
 
 class Timer:
